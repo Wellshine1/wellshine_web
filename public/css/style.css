@@ -328,28 +328,28 @@ footer {
     .pill-nav { 
         width: fit-content; 
         max-width: 95%; 
-        gap: 8px; 
-        padding: 8px 12px; 
+        gap: 6px; 
+        padding: 6px 10px; 
         top: 15px;
     }
     .pill-nav a {
-        font-size: 0.7rem;
+        font-size: 0.65rem;
         letter-spacing: 0.5px;
         white-space: nowrap;
     }
     .theme-toggle-btn {
-        width: 28px;
-        height: 28px;
-        font-size: 0.8rem;
+        width: 26px;
+        height: 26px;
+        font-size: 0.75rem;
     }
     .login-pill-btn, .profile-pill-btn {
-        padding: 6px 12px !important;
-        font-size: 0.7rem !important;
+        padding: 5px 8px !important;
+        font-size: 0.65rem !important;
     }
     .dropdown-toggle {
         display: inline-flex !important;
         align-items: center;
-        gap: 4px;
+        gap: 3px;
         white-space: nowrap;
     }
     section {
