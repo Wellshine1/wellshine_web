@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wellshine | Premium Wholesale Portal</title>
+    <link rel="stylesheet" href="css/shop.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Early theme check to prevent flash -->
+    <script>
+        (function() {
+            const savedTheme = localStorage.getItem('wellshine_theme');
+            if (savedTheme === 'light') {
+                document.documentElement.classList.add('light-theme');
+            }
+        })();
+    </script>
+</head>
+<body class="shop-page">
+
+    <div class="hero-bg"></div>
+
+    <!-- HEADER NAVIGATION -->
+    <header class="shop-header">
+        <div class="back-home" onclick="location.href='index.html'">
+            <i class="fas fa-chevron-left"></i> WELLSHINE
+        </div>
+        
+        <div class="header-right">
+            <button id="theme-toggle" class="theme-toggle-btn" style="margin-right: 15px;" title="Toggle Theme">
+                <i class="fas fa-moon"></i>
+            </button>
+            <a href="https://www.amazon.in/s?me=A2PNVSMR4YUKPK" target="_blank" class="amazon-header-btn">
+                <i class="fab fa-amazon"></i> <span>Amazon Store</span>
+            </a>
+            <div class="cart-pill" onclick="openCheckout()">
+                <i class="fas fa-shopping-basket"></i>
+                <span id="cart-count">0</span>
+            </div>
+        </div>
+    </header>
+
+    <!-- SEARCH PANEL -->
+    <div class="search-container-wrap">
+        <div class="glass-search-box">
+            <i class="fas fa-search search-icon"></i>
+            <input type="text" id="search-input" placeholder="Search premium wholesale stock..." oninput="handleSearch(this.value)">
+        </div>
+    </div>
+
+    <!-- CATEGORIES TRACKER WITH COUNT BADGES -->
+    <div class="category-scroll">
+        <button class="filter-btn active" onclick="filterShop('all', this)">All <span class="badge-count" id="count-all">0</span></button>
+        <button class="filter-btn" onclick="filterShop('Cashew', this)">Cashews <span class="badge-count" id="count-Cashew">0</span></button>
+        <button class="filter-btn" onclick="filterShop('Dry Fruits', this)">Dry Fruits & Seeds <span class="badge-count" id="count-Dry Fruits">0</span></button>
+        <button class="filter-btn" onclick="filterShop('Oats & Millets', this)">Oats & Millets <span class="badge-count" id="count-Oats & Millets">0</span></button>
+        <button class="filter-btn" onclick="filterShop('Snacks & Breakfast', this)">Snacks & Breakfast <span class="badge-count" id="count-Snacks & Breakfast">0</span></button>
+        <button class="filter-btn" onclick="filterShop('Spices', this)">Spices & Pastes <span class="badge-count" id="count-Spices">0</span></button>
+    </div>
+
+    <!-- PRODUCTS GRID -->
+    <main class="shop-grid" id="shop-items"></main>
+
+    <!-- E-COMMERCE SIDEBAR CART -->
+    <div id="order-sidebar" class="order-sidebar">
+        <div class="sidebar-header">
+            <h2><i class="fas fa-shopping-basket"></i> Wholesale Basket</h2>
+            <div style="display:flex; align-items:center; gap: 15px;">
+                <button type="button" class="clear-cart-btn" onclick="clearCart()" title="Clear Entire Basket">
+                    <i class="fas fa-trash-sweep"></i> Clear
+                </button>
+                <button type="button" onclick="closeCheckout()" class="close-sidebar-btn">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+        </div>
+        <div class="sidebar-body">
+            <div id="cart-list" class="cart-items-container"></div>
+            
+            <div class="cart-footer">
+                <div class="cart-total-row">
+                    <span>Grand Total:</span>
+                    <span id="cart-total-value" class="total-price">₹0</span>
+                </div>
+                
+                <form id="checkout-form" class="auth-form">
+                    <div class="input-wrap">
+                        <i class="fas fa-store input-icon"></i>
+                        <input type="text" id="cust-name" placeholder="Business / Shop Name" required>
+                    </div>
+                    <div class="input-wrap">
+                        <i class="fas fa-map-marker-alt input-icon"></i>
+                        <textarea id="cust-address" placeholder="Full Delivery Address with Landmark" rows="2" required></textarea>
+                    </div>
+                    <div class="input-wrap">
+                        <i class="fas fa-comment-dots input-icon"></i>
+                        <textarea id="cust-instructions" placeholder="Special Delivery Instructions (Optional)" rows="2"></textarea>
+                    </div>
+                    <button type="submit" class="whatsapp-send">
+                        <span>SEND WHATSAPP ORDER</span>
+                        <i class="fab fa-whatsapp"></i>
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- PRODUCT QUICK VIEW OVERLAY MODAL -->
+    <div id="quickview-modal" class="qv-modal-overlay"></div>
+
+    <script src="js/auth.js"></script>
+    <script src="js/shop.js"></script>
+</body>
+</html>

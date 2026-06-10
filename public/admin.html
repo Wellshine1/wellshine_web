@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wellshine Distributors | Admin Dashboard</title>
+    <link rel="stylesheet" href="css/products.css">
+    <link rel="stylesheet" href="css/admin.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Early theme check to prevent flash -->
+    <script>
+        (function() {
+            const savedTheme = localStorage.getItem('wellshine_theme');
+            if (savedTheme === 'light') {
+                document.documentElement.classList.add('light-theme');
+            }
+        })();
+    </script>
+</head>
+<body class="admin-page">
+
+    <div class="hero-bg"></div>
+
+    <!-- HEADER NAVIGATION -->
+    <header class="products-header">
+        <div class="back-home" onclick="location.href='index.html'">
+            <i class="fas fa-chevron-left"></i> WELLSHINE
+        </div>
+        
+        <h2 class="admin-header-title"><i class="fas fa-user-shield"></i> Portal Management</h2>
+
+        <nav class="header-nav">
+            <button id="theme-toggle" class="theme-toggle-btn" title="Toggle Theme">
+                <i class="fas fa-moon"></i>
+            </button>
+            <button id="logout-btn" class="logout-btn" style="display: none;" onclick="logoutAdmin()">
+                <i class="fas fa-sign-out-alt"></i> Logout
+            </button>
+        </nav>
+    </header>
+
+    <!-- LOGIN SCREEN -->
+    <div id="login-container" class="login-container">
+        <div class="login-card glass-card">
+            <div class="login-icon">
+                <i class="fas fa-lock"></i>
+            </div>
+            <h2>Admin Verification</h2>
+            <p>Access requires the Wellshine staff passcode.</p>
+            <form id="login-form">
+                <div class="input-wrap">
+                    <i class="fas fa-key input-icon"></i>
+                    <input type="password" id="passcode-input" placeholder="Enter Admin Passcode" required autocomplete="current-password">
+                </div>
+                <button type="submit" class="login-submit-btn">Verify Identity</button>
+                <p id="login-error" class="error-msg"></p>
+            </form>
+        </div>
+    </div>
+
+    <!-- DASHBOARD CONTAINER (Initially Hidden) -->
+    <div id="dashboard-container" class="dashboard-container" style="display: none;">
+        <!-- Sidebar Navigation -->
+        <aside class="admin-sidebar glass-card">
+            <div class="sidebar-user">
+                <div class="avatar"><i class="fas fa-user-tie"></i></div>
+                <div class="user-info">
+                    <h3>Administrator</h3>
+                    <span>Store Manager</span>
+                </div>
+            </div>
+            <ul class="sidebar-menu">
+                <li class="menu-item active" data-tab="inventory" onclick="switchTab('inventory')">
+                    <i class="fas fa-boxes"></i> <span>Stock Inventory</span>
+                </li>
+                <li class="menu-item" data-tab="vyapar-sync" onclick="switchTab('vyapar-sync')">
+                    <i class="fas fa-sync-alt"></i> <span>Vyapar Sync</span>
+                </li>
+                <li class="menu-item" data-tab="orders" onclick="switchTab('orders')">
+                    <i class="fas fa-receipt"></i> <span>Customer Orders</span>
+                </li>
+                <li class="menu-item" data-tab="users" onclick="switchTab('users')">
+                    <i class="fas fa-users"></i> <span>Registered Shops</span>
+                </li>
+            </ul>
+        </aside>
+
+        <!-- Main Dashboard Viewport -->
+        <main class="admin-viewport">
+            
+            <!-- TAB 1: INVENTORY MANAGEMENT -->
+            <section id="tab-inventory" class="tab-section active">
+                <div class="viewport-header">
+                    <div>
+                        <h1>Stock Inventory</h1>
+                        <p>Manage product stock levels, view availability, and save updates.</p>
+                    </div>
+                </div>
+
+                <div class="controls-bar glass-card">
+                    <div class="search-box">
+                        <i class="fas fa-search"></i>
+                        <input type="text" id="inventory-search" placeholder="Search products by name or tag..." oninput="filterInventory()">
+                    </div>
+                    <div class="filter-dropdown">
+                        <i class="fas fa-filter"></i>
+                        <select id="inventory-cat-filter" onchange="filterInventory()">
+                            <option value="all">All Categories</option>
+                            <option value="Cashew">Cashews</option>
+                            <option value="Dry Fruits">Dry Fruits & Seeds</option>
+                            <option value="Oats & Millets">Oats & Millets</option>
+                            <option value="Snacks & Breakfast">Snacks & Breakfast</option>
+                            <option value="Spices">Spices & Pastes</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="table-container glass-card">
+                    <table class="admin-table">
+                        <thead>
+                            <tr>
+                                <th width="80">ID</th>
+                                <th>Product Details</th>
+                                <th>Category</th>
+                                <th width="150">Price</th>
+                                <th width="180">Current Stock</th>
+                                <th width="120">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="inventory-table-body">
+                            <!-- Populated dynamically -->
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- TAB 2: VYAPAR CSV SYNC -->
+            <section id="tab-vyapar-sync" class="tab-section">
+                <div class="viewport-header">
+                    <div>
+                        <h1>Vyapar CSV Sync Integration</h1>
+                        <p>Export your stock catalog from Vyapar as a CSV and upload it here to auto-sync quantities.</p>
+                    </div>
+                </div>
+
+                <div class="vyapar-grid">
+                    <!-- CSV Upload Panel -->
+                    <div class="glass-card upload-panel">
+                        <div class="panel-icon"><i class="fas fa-file-csv"></i></div>
+                        <h2>Step 1: Upload Vyapar Export File</h2>
+                        <p>Choose the <strong>CSV</strong> file exported from your Vyapar application (typically contains Item Name and Quantity).</p>
+                        
+                        <div class="drop-zone" id="csv-drop-zone">
+                            <i class="fas fa-cloud-upload-alt"></i>
+                            <p>Drag & drop Vyapar CSV file here or <span>click to browse</span></p>
+                            <input type="file" id="csv-file-input" accept=".csv" style="display: none;">
+                        </div>
+                        <div id="file-info" class="file-info" style="display: none;">
+                            <i class="fas fa-file-alt"></i> <span id="file-name">filename.csv</span>
+                        </div>
+                    </div>
+
+                    <!-- Column Mapper (Initially disabled) -->
+                    <div class="glass-card mapper-panel disabled" id="mapper-panel">
+                        <div class="panel-icon"><i class="fas fa-columns"></i></div>
+                        <h2>Step 2: Map CSV Columns</h2>
+                        <p>Select which columns in your CSV file represent the Product Name and the Stock Quantity.</p>
+                        
+                        <div class="mapper-form">
+                            <div class="map-field">
+                                <label for="map-name">Product / Item Name Column:</label>
+                                <select id="map-name" onchange="processCSVData()"></select>
+                            </div>
+                            <div class="map-field">
+                                <label for="map-stock">Stock Quantity Column:</label>
+                                <select id="map-stock" onchange="processCSVData()"></select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Preview Panel (Initially Hidden) -->
+                <div class="glass-card preview-panel" id="preview-panel" style="display: none;">
+                    <div class="preview-header">
+                        <div>
+                            <h2>Step 3: Preview and Match Results</h2>
+                            <p id="preview-stats">Matched 0 out of 0 items in CSV.</p>
+                        </div>
+                        <button class="sync-action-btn" id="sync-btn" onclick="executeSync()">
+                            <i class="fas fa-sync"></i> Synchronize Stock Now
+                        </button>
+                    </div>
+
+                    <div class="preview-filter">
+                        <button class="preview-filter-btn active" onclick="filterPreview('all')">All Rows</button>
+                        <button class="preview-filter-btn" onclick="filterPreview('matched')">Matched Only</button>
+                        <button class="preview-filter-btn" onclick="filterPreview('unmatched')">Unmatched Only ⚠️</button>
+                    </div>
+
+                    <div class="table-container shadow-inset">
+                        <table class="admin-table">
+                            <thead>
+                                <tr>
+                                    <th>Vyapar Item Name</th>
+                                    <th>Website Product Match</th>
+                                    <th width="150">Current Stock</th>
+                                    <th width="150">New Vyapar Stock</th>
+                                    <th width="150">Status</th>
+                                </tr>
+                            </thead>
+                            <tbody id="preview-table-body">
+                                <!-- Populated dynamically -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- TAB 3: CUSTOMER ORDERS LOG -->
+            <section id="tab-orders" class="tab-section">
+                <div class="viewport-header">
+                    <div>
+                        <h1>Customer Orders</h1>
+                        <p>View, track, and manage checkout orders received through the wholesale store.</p>
+                    </div>
+                </div>
+
+                <div class="table-container glass-card">
+                    <table class="admin-table">
+                        <thead>
+                            <tr>
+                                <th width="100">Order ID</th>
+                                <th>Customer Details</th>
+                                <th>Items Ordered</th>
+                                <th width="120">Total Price</th>
+                                <th width="120">Status</th>
+                                <th width="180">Order Date</th>
+                                <th width="150">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="orders-table-body">
+                            <!-- Populated dynamically -->
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- TAB 4: REGISTERED SHOPS -->
+            <section id="tab-users" class="tab-section">
+                <div class="viewport-header">
+                    <div>
+                        <h1>Registered Users & Shops</h1>
+                        <p>View and manage wholesale shops and retail individuals registered on the portal.</p>
+                    </div>
+                </div>
+
+                <div class="table-container glass-card">
+                    <table class="admin-table">
+                        <thead>
+                            <tr>
+                                <th width="80">ID</th>
+                                <th>Name / Shop Name</th>
+                                <th width="150">Account Type</th>
+                                <th>Email Contact</th>
+                                <th>Delivery/Billing Address</th>
+                                <th width="180">Registration Date</th>
+                            </tr>
+                        </thead>
+                        <tbody id="users-table-body">
+                            <!-- Populated dynamically -->
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+        </main>
+    </div>
+
+    <!-- Notification Toast -->
+    <div id="toast" class="toast"></div>
+
+    <script src="js/admin.js"></script>
+</body>
+</html>

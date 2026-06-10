@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wellshine Distributors | Product Showcase</title>
+    <link rel="stylesheet" href="css/products.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Early theme check to prevent flash -->
+    <script>
+        (function() {
+            const savedTheme = localStorage.getItem('wellshine_theme');
+            if (savedTheme === 'light') {
+                document.documentElement.classList.add('light-theme');
+            }
+        })();
+    </script>
+</head>
+<body class="products-page">
+
+    <div class="hero-bg"></div>
+
+    <!-- HEADER NAVIGATION -->
+    <header class="products-header">
+        <div class="back-home" onclick="location.href='index.html'">
+            <i class="fas fa-chevron-left"></i> WELLSHINE
+        </div>
+        
+        <nav class="header-nav">
+            <a href="index.html">Home</a>
+            <a href="products.html" class="active-link">Products</a>
+            <div class="dropdown">
+                <a href="#" class="gold-link-btn dropdown-toggle" onclick="event.preventDefault()">Shop <i class="fas fa-chevron-down" style="font-size:0.6rem; margin-left:3px; vertical-align: middle;"></i></a>
+                <div class="dropdown-menu">
+                    <a href="shop.html"><i class="fas fa-store"></i> Wellshine Store</a>
+                    <a href="https://www.amazon.in/s?me=A2PNVSMR4YUKPK" target="_blank"><i class="fab fa-amazon"></i> Amazon Store</a>
+                </div>
+            </div>
+            <button id="theme-toggle" class="theme-toggle-btn" title="Toggle Theme">
+                <i class="fas fa-moon"></i>
+            </button>
+        </nav>
+    </header>
+
+    <!-- HEADER INTRO -->
+    <div class="catalog-intro-wrap">
+        <h1 class="catalog-title">Product Portfolio</h1>
+        <p class="catalog-subtitle">Nature's finest collection of wholesale agricultural goods, handpicked and packed with purity.</p>
+    </div>
+
+    <!-- SEARCH & FILTER PANEL -->
+    <div class="search-container-wrap">
+        <div class="glass-search-box">
+            <i class="fas fa-search search-icon"></i>
+            <input type="text" id="search-input" placeholder="Search product portfolio..." oninput="handleSearch(this.value)">
+        </div>
+    </div>
+
+    <!-- CATEGORIES SELECTOR -->
+    <div class="category-scroll">
+        <button class="filter-btn active" onclick="filterCatalog('all', this)">All <span class="badge-count" id="count-all">0</span></button>
+        <button class="filter-btn" onclick="filterCatalog('Cashew', this)">Cashews <span class="badge-count" id="count-Cashew">0</span></button>
+        <button class="filter-btn" onclick="filterCatalog('Dry Fruits', this)">Dry Fruits & Seeds <span class="badge-count" id="count-Dry Fruits">0</span></button>
+        <button class="filter-btn" onclick="filterCatalog('Oats & Millets', this)">Oats & Millets <span class="badge-count" id="count-Oats & Millets">0</span></button>
+        <button class="filter-btn" onclick="filterCatalog('Snacks & Breakfast', this)">Snacks & Breakfast <span class="badge-count" id="count-Snacks & Breakfast">0</span></button>
+        <button class="filter-btn" onclick="filterCatalog('Spices', this)">Spices & Pastes <span class="badge-count" id="count-Spices">0</span></button>
+    </div>
+
+    <!-- PRODUCTS GALLERY GRID -->
+    <main class="products-grid" id="catalog-items"></main>
+
+    <!-- PRODUCT QUICK VIEW OVERLAY MODAL -->
+    <div id="quickview-modal" class="qv-modal-overlay"></div>
+
+    <script src="js/auth.js"></script>
+    <script src="js/products.js"></script>
+</body>
+</html>

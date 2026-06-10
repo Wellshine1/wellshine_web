@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wellshine Distributors | Official Hub</title>
+    <meta name="description" content="Official wholesale distributor of CDC Cashews (Govt. of Kerala), premium dry fruits, millets, spices, and snacks in Pala, Kerala. Wellshine Distributors.">
+    <meta name="keywords" content="CDC Cashews, Wellshine, Distributors, Pala, Kerala, Wholesale, Cashews, Dry Fruits, Oats, Millets, Spices, Food Distribution">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Early theme check to prevent flash -->
+    <script>
+        (function() {
+            const savedTheme = localStorage.getItem('wellshine_theme');
+            if (savedTheme === 'light') {
+                document.documentElement.classList.add('light-theme');
+            }
+        })();
+    </script>
+</head>
+<body>
+
+    <div class="hero-bg">
+        <div class="slide"></div>
+        <div class="slide"></div>
+        <div class="slide"></div>
+        <div class="slide"></div>
+    </div>
+
+    <nav class="pill-nav">
+        <a href="#home">Home</a>
+        <a href="#about">About</a>
+        <a href="products.html">Products</a>
+        <a href="#contact">Contact</a>
+        <div class="dropdown">
+            <a href="#" class="gold-link dropdown-toggle" onclick="event.preventDefault()">Shop <i class="fas fa-chevron-down" style="font-size:0.6rem; margin-left:3px; vertical-align: middle;"></i></a>
+            <div class="dropdown-menu">
+                <a href="shop.html"><i class="fas fa-store"></i> Wellshine Store</a>
+                <a href="https://www.amazon.in/s?me=A2PNVSMR4YUKPK" target="_blank"><i class="fab fa-amazon"></i> Amazon Store</a>
+            </div>
+        </div>
+        <button id="theme-toggle" class="theme-toggle-btn" title="Toggle Theme">
+            <i class="fas fa-moon"></i>
+        </button>
+    </nav>
+
+    <section id="home" class="hero-content">
+        <div data-aos="zoom-out" data-aos-duration="1500">
+            <h1 class="main-title">WELLSHINE</h1>
+            <p class="sub-title">DISTRIBUTORS</p>
+            <p class="govt-tag">Official Distributor of CDC Cashew (Govt. of Kerala)</p>
+            <p class="premium-quote">"Nature's Finest, Handpicked for the Perfectionist."</p>
+        </div>
+    </section>
+
+    <!-- FEATURED CAROUSEL SECTION -->
+    <section id="featured-carousel" class="carousel-section">
+        <h2 class="section-heading" data-aos="fade-up">Bestsellers</h2>
+        
+        <div class="carousel-container" data-aos="zoom-in" data-aos-duration="1200">
+            <!-- Left Arrow -->
+            <button class="carousel-arrow prev-arrow" onclick="moveSlide(-1)">&lt;</button>
+            
+            <div class="carousel-track-wrapper">
+                <div class="carousel-track" id="carousel-track">
+                    
+                    <!-- Slide 1: CDC Cashews -->
+                    <div class="carousel-slide active">
+                        <div class="slide-grid">
+                            <div class="slide-img-side">
+                                <img src="pics/products/cashew-2.jpg" alt="CDC Cashews W240" onerror="this.src='pics/products/croast.jpg'">
+                            </div>
+                            <div class="slide-info-side">
+                                <span class="slide-tag">Govt. Certified</span>
+                                <h3 class="slide-title">CDC Cashews (W240 Grade)</h3>
+                                <p class="slide-desc">Enjoy whole cashew kernels sourced directly from the Cashew Development Corporation (Govt. of Kerala). Crisp, premium quality, and packed under certified conditions.</p>
+                                <p class="slide-price">₹425 <span class="unit-label">/ 250g</span></p>
+                                <button class="slide-btn" onclick="location.href='products.html'">View in Showcase</button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Slide 2: Mixed Dry Fruits Rectangular Tray -->
+                    <div class="carousel-slide">
+                        <div class="slide-grid">
+                            <div class="slide-img-side">
+                                <img src="pics/products/mixed-dry-fruits-rect.jpg" alt="Premium Mixed Dry Fruits" onerror="this.src='pics/products/mdryfruit.jpg'">
+                            </div>
+                            <div class="slide-info-side">
+                                <span class="slide-tag">Exquisite Gift Tray</span>
+                                <h3 class="slide-title">Mixed Premium Dry Fruits (400g)</h3>
+                                <p class="slide-desc">A premium rectangular partition tray packed with high-grade almonds, cashews, pistachios, dates, kiwi slices, and dehydrated mango. Ideal for gifting or sharing.</p>
+                                <p class="slide-price">₹599 <span class="unit-label">/ 400g</span></p>
+                                <button class="slide-btn" onclick="location.href='products.html'">View in Showcase</button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Slide 3: Dried Jackfruit -->
+                    <div class="carousel-slide">
+                        <div class="slide-grid">
+                            <div class="slide-img-side">
+                                <img src="pics/products/dried-jackfruit-pack.jpg" alt="Dried Jackfruit Slices" onerror="this.src='pics/products/jackfruit-chips.jpg'">
+                            </div>
+                            <div class="slide-info-side">
+                                <span class="slide-tag">100% Natural Sweet</span>
+                                <h3 class="slide-title">Dried Jackfruits (Chakka Slices)</h3>
+                                <p class="slide-desc">Handpicked local yellow jackfruit slices, naturally sun-dehydrated and vacuum sealed without any artificial sweeteners or chemical preservatives. Nutrient-rich and chewy.</p>
+                                <p class="slide-price">₹450 <span class="unit-label">/ 500g</span></p>
+                                <button class="slide-btn" onclick="location.href='products.html'">View in Showcase</button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Slide 4: Arrowroot Powder -->
+                    <div class="carousel-slide">
+                        <div class="slide-grid">
+                            <div class="slide-img-side">
+                                <img src="pics/products/arrowroot.jpg" alt="Arrowroot Powder" onerror="this.src='pics/products/croast.jpg'">
+                            </div>
+                            <div class="slide-info-side">
+                                <span class="slide-tag">Traditional Healing Food</span>
+                                <h3 class="slide-title">Premium Arrowroot Powder</h3>
+                                <p class="slide-desc">100% organic, sun-dried traditional arrowroot powder (Koova Podi). Well-known in Kerala for its cooling properties and soothing effects on digestion.</p>
+                                <p class="slide-price">₹600 <span class="unit-label">/ 500g</span></p>
+                                <button class="slide-btn" onclick="location.href='products.html'">View in Showcase</button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                </div>
+            </div>
+            
+            <!-- Right Arrow -->
+            <button class="carousel-arrow next-arrow" onclick="moveSlide(1)">&gt;</button>
+        </div>
+        
+        <!-- Navigation Dots -->
+        <div class="carousel-dots">
+            <span class="dot active" onclick="setSlide(0)"></span>
+            <span class="dot" onclick="setSlide(1)"></span>
+            <span class="dot" onclick="setSlide(2)"></span>
+            <span class="dot" onclick="setSlide(3)"></span>
+        </div>
+    </section>
+
+    <section id="about">
+        <div class="clean-card" data-aos="fade-up">
+            <h2 class="section-heading">Our Legacy</h2>
+            <p class="about-text">
+                Wellshine Distributors stands as a pillar of quality in <strong>Pala, Kerala</strong>. We specialize in the wholesale distribution of premium food products, bridging the gap between nature’s harvest and your retail shelves. As the <strong>authorized distributor for CDC Cashews (Govt. of Kerala)</strong>, we uphold the highest standards of purity and trust.
+            </p>
+        </div>
+    </section>
+
+
+    <div class="bottom-layout">
+        <section id="contact">
+            <div class="contact-glass-box" data-aos="fade-up">
+                <h2 class="section-heading">DIRECT CONNECT</h2>
+                <div class="contact-icons">
+                    <a href="https://wa.me/919447097212" target="_blank"><i class="fab fa-whatsapp"></i></a>
+                    <a href="mailto:wellshinedistributors@gmail.com"><i class="fas fa-envelope"></i></a>
+                </div>
+            </div>
+        </section>
+
+        <footer id="footer-area">
+            <div class="map-box" data-aos="fade-in">
+                <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3932.6096581853894!2d76.68495257301636!3d9.714316949998464!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3b07cdcd01ed01b3%3A0xb08989f2d73a15f0!2sWELL%20SHINE!5e0!3m2!1sen!2sin!4v1779084594591!5m2!1sen!2sin"width="100%" height="100%" style="border:0;" allowfullscreen="" loading="lazy"></iframe>
+            </div>
+
+            <div class="footer-bottom">
+                <div class="col">
+                    <h3>Wellshine.</h3>
+                    <p>Authorized CDC Distributor</p>
+                    <p>Kattakkayam Road, Pala, Kerala</p>
+                </div>
+                <div class="col">
+                    <p>GST: 32ADRPV0159R1ZP</p>
+                    <p>License: James Arimattam Group</p>
+                </div>
+            </div>
+            <p class="credits">© 2026 Wellshine Distributors. Site by Arjun Prasanth.</p>
+        </footer>
+    </div>
+
+    <!-- JS script to handle Bestsellers Carousel, Dropdown menu, and Theme Switcher -->
+    <script>
+        // --- FEATURED BESTSELLERS CAROUSEL ENGINE ---
+        let currentSlide = 0;
+        let slideInterval;
+        let slides, dots, track;
+
+        function initCarousel() {
+            slides = document.querySelectorAll('.carousel-slide');
+            dots = document.querySelectorAll('.dot');
+            track = document.getElementById('carousel-track');
+            
+            showSlide(0);
+            startAutoCycle();
+        }
+
+        function showSlide(index) {
+            if (!slides || slides.length === 0) return;
+            
+            // Boundary checks
+            if (index >= slides.length) currentSlide = 0;
+            else if (index < 0) currentSlide = slides.length - 1;
+            else currentSlide = index;
+
+            // Shift slide track
+            if (track) {
+                track.style.transform = `translateX(-${currentSlide * 100}%)`;
+            }
+
+            // Update active states
+            slides.forEach((slide, idx) => {
+                if (idx === currentSlide) slide.classList.add('active');
+                else slide.classList.remove('active');
+            });
+
+            dots.forEach((dot, idx) => {
+                if (idx === currentSlide) dot.classList.add('active');
+                else dot.classList.remove('active');
+            });
+        }
+
+        function moveSlide(step) {
+            clearInterval(slideInterval);
+            showSlide(currentSlide + step);
+            startAutoCycle();
+        }
+
+        function setSlide(index) {
+            clearInterval(slideInterval);
+            showSlide(index);
+            startAutoCycle();
+        }
+
+        function startAutoCycle() {
+            slideInterval = setInterval(() => {
+                showSlide(currentSlide + 1);
+            }, 5000);
+        }
+
+        // --- THEME ENGINE ---
+        function updateThemeIcon() {
+            const icon = document.querySelector('#theme-toggle i');
+            if (!icon) return;
+            const isLight = document.documentElement.classList.contains('light-theme');
+            if (isLight) {
+                icon.className = 'fas fa-sun';
+            } else {
+                icon.className = 'fas fa-moon';
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            // Init Carousel elements
+            initCarousel();
+
+            // Navigation Shop Dropdown toggle
+            const dropdownToggle = document.querySelector('.dropdown-toggle');
+            const dropdownMenu = document.querySelector('.dropdown-menu');
+            if (dropdownToggle && dropdownMenu) {
+                dropdownToggle.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    dropdownMenu.classList.toggle('show');
+                });
+                
+                document.addEventListener('click', (e) => {
+                    if (!dropdownToggle.contains(e.target) && !dropdownMenu.contains(e.target)) {
+                        dropdownMenu.classList.remove('show');
+                    }
+                });
+            }
+
+            // Theme Toggle Button
+            const themeBtn = document.getElementById('theme-toggle');
+            if (themeBtn) {
+                updateThemeIcon();
+                themeBtn.addEventListener('click', () => {
+                    const isLight = document.documentElement.classList.toggle('light-theme');
+                    localStorage.setItem('wellshine_theme', isLight ? 'light' : 'dark');
+                    updateThemeIcon();
+                });
+            }
+        });
+    </script>
+
+    <script src="js/auth.js"></script>
+    <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
+    <script>AOS.init({ once: true });</script>
+</body>
+</html>
