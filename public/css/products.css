@@ -114,6 +114,7 @@ body {
     text-transform: uppercase;
     letter-spacing: 1px;
     transition: 0.3s;
+    white-space: nowrap;
 }
 .header-nav a:hover, .header-nav a.active-link {
     color: #fff;
@@ -125,6 +126,11 @@ body {
     padding: 8px 18px;
     border-radius: 50px;
     font-weight: 800 !important;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    white-space: nowrap;
 }
 .gold-link-btn:hover {
     box-shadow: 0 0 15px rgba(212, 175, 55, 0.4);
@@ -203,6 +209,12 @@ body {
         width: 90%;
         transform: none;
         box-shadow: 0 15px 35px rgba(0, 0, 0, 0.9);
+    }
+    .dropdown-toggle {
+        display: inline-flex !important;
+        align-items: center;
+        gap: 4px;
+        white-space: nowrap;
     }
 }
 
