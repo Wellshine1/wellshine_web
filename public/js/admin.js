@@ -231,14 +231,108 @@ function renderInventoryTable(items) {
                     </div>
                 </td>
                 <td>
-                    <button class="save-row-btn" id="save-btn-${item.id}" onclick="saveProductStock(${item.id})">
-                        <i class="fas fa-save"></i> Save
-                    </button>
+                    <div style="display: flex; gap: 6px;">
+                        <button class="save-row-btn" id="save-btn-${item.id}" onclick="saveProductStock(${item.id})">
+                            <i class="fas fa-save"></i> Save
+                        </button>
+                        <button class="edit-row-btn" onclick="openEditModal(${item.id})" style="background: var(--gold); color: #000; border: none; padding: 6px 12px; border-radius: 8px; cursor: pointer; display: flex; align-items: center; gap: 5px; font-weight: 700; font-size: 0.8rem; transition: 0.2s;">
+                            <i class="fas fa-edit"></i> Edit
+                        </button>
+                    </div>
                 </td>
             </tr>
         `;
     }).join('');
 }
+
+window.openEditModal = function(id) {
+    const item = adminProducts.find(p => p.id === id);
+    if (!item) return;
+    
+    document.getElementById('edit-product-id').value = item.id;
+    document.getElementById('edit-product-name').value = item.name;
+    document.getElementById('edit-product-category').value = item.cat;
+    document.getElementById('edit-product-price').value = item.price;
+    document.getElementById('edit-product-unit').value = item.unit;
+    document.getElementById('edit-product-tag').value = item.tag;
+    document.getElementById('edit-product-img').value = item.img;
+    document.getElementById('edit-product-desc').value = item.description || '';
+    
+    document.getElementById('edit-modal').style.display = 'flex';
+};
+
+window.closeEditModal = function() {
+    document.getElementById('edit-modal').style.display = 'none';
+};
+
+window.saveProductDetails = async function(event) {
+    event.preventDefault();
+    
+    const id = parseInt(document.getElementById('edit-product-id').value);
+    const name = document.getElementById('edit-product-name').value.trim();
+    const cat = document.getElementById('edit-product-category').value;
+    const price = parseInt(document.getElementById('edit-product-price').value);
+    const unit = document.getElementById('edit-product-unit').value.trim();
+    const tag = document.getElementById('edit-product-tag').value.trim();
+    const img = document.getElementById('edit-product-img').value.trim();
+    const description = document.getElementById('edit-product-desc').value.trim();
+    
+    try {
+        const res = await fetch('/api/admin/products/update', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${getAdminPasscode()}`
+            },
+            body: JSON.stringify({
+                productId: id,
+                name,
+                cat,
+                price,
+                unit,
+                tag,
+                img,
+                description
+            })
+        });
+        
+        if (res.ok) {
+            showToast('Product details updated successfully!', 'success');
+            // Update in memory
+            const originalItem = adminProducts.find(p => p.id === id);
+            if (originalItem) {
+                originalItem.name = name;
+                originalItem.cat = cat;
+                originalItem.price = price;
+                originalItem.unit = unit;
+                originalItem.tag = tag;
+                originalItem.img = img;
+                originalItem.description = description;
+            }
+            closeEditModal();
+            // Re-render table with current search/filter state
+            filterInventory();
+        } else {
+            let errorMsg = 'Failed to update product details.';
+            try {
+                const data = await res.json();
+                errorMsg = data.error || errorMsg;
+            } catch (e) {}
+            showToast(errorMsg, 'error');
+        }
+    } catch (err) {
+        console.error('Update product details error:', err);
+        showToast('Connection error during product update.', 'error');
+    }
+};
+
+// Close modal when clicking outside of it
+window.addEventListener('click', (e) => {
+    const modal = document.getElementById('edit-modal');
+    if (e.target === modal) {
+        closeEditModal();
+    }
+});
 
 window.adjustStockInput = function(id, delta) {
     const input = document.getElementById(`stock-input-${id}`);

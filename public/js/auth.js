@@ -1,5 +1,6 @@
 // Customer Session & Authentication Management
 window.currentCustomer = null;
+let pendingRegistration = null;
 
 // Self-contained CSS styles for Auth Modal
 const authStyles = `
@@ -373,9 +374,25 @@ function injectAuthModal() {
                         <i class="fas fa-map-marker-alt auth-input-icon"></i>
                         <textarea id="signup-address" placeholder="Full Billing/Delivery Address" rows="2" required></textarea>
                     </div>
-                    <button type="submit" class="auth-submit-btn">Create Account</button>
+                    <button type="submit" class="auth-submit-btn">Send OTP Code</button>
                     <div class="auth-error" id="signup-error"></div>
                     <div class="auth-success-msg" id="signup-success">Account created! Switch to Sign In to login.</div>
+                </form>
+            </div>
+
+            <!-- Tab 3: OTP Verification -->
+            <div class="auth-form-panel" id="panel-otp">
+                <h3>Verify Email Address</h3>
+                <p>We've sent a 6-digit code to <strong id="otp-target-email">your email</strong>. Please enter it below to complete signup.</p>
+                <form id="customer-otp-form">
+                    <div class="auth-input-wrap">
+                        <i class="fas fa-key auth-input-icon"></i>
+                        <input type="text" id="otp-code-input" placeholder="6-Digit Verification Code" required maxlength="6" pattern="\\d{6}" style="letter-spacing: 5px; text-align: center; font-size: 1.2rem; font-weight: 700;">
+                    </div>
+                    <button type="submit" class="auth-submit-btn">Verify & Create Account</button>
+                    <button type="button" onclick="switchAuthTab('signup')" style="background:none; border:none; color:var(--gold); cursor:pointer; font-size:0.85rem; font-weight:700; margin-top:15px; width:100%; text-align:center;">Back to Registration</button>
+                    <div class="auth-error" id="otp-error"></div>
+                    <div class="auth-success-msg" id="otp-success">Verification successful! Creating account...</div>
                 </form>
             </div>
         </div>
@@ -385,6 +402,7 @@ function injectAuthModal() {
     // Form Submissions
     document.getElementById("customer-signin-form").onsubmit = submitSignIn;
     document.getElementById("customer-signup-form").onsubmit = submitSignUp;
+    document.getElementById("customer-otp-form").onsubmit = submitOTP;
 }
 
 window.openAuthModal = function() {
@@ -402,17 +420,28 @@ window.switchAuthTab = function(tab) {
     const btnSignup = document.getElementById("tab-btn-signup");
     const panelSignin = document.getElementById("panel-signin");
     const panelSignup = document.getElementById("panel-signup");
+    const panelOtp = document.getElementById("panel-otp");
+    const tabsContainer = document.querySelector(".auth-tabs");
 
     if (tab === "signin") {
+        if (tabsContainer) tabsContainer.style.display = "flex";
         btnSignin.classList.add("active");
         btnSignup.classList.remove("active");
         panelSignin.classList.add("active");
         panelSignup.classList.remove("active");
-    } else {
+        if (panelOtp) panelOtp.classList.remove("active");
+    } else if (tab === "signup") {
+        if (tabsContainer) tabsContainer.style.display = "flex";
         btnSignup.classList.add("active");
         btnSignin.classList.remove("active");
         panelSignup.classList.add("active");
         panelSignin.classList.remove("active");
+        if (panelOtp) panelOtp.classList.remove("active");
+    } else if (tab === "otp") {
+        if (tabsContainer) tabsContainer.style.display = "none";
+        panelSignin.classList.remove("active");
+        panelSignup.classList.remove("active");
+        if (panelOtp) panelOtp.classList.add("active");
     }
 };
 
@@ -595,38 +624,87 @@ async function submitSignIn(e) {
 
 async function submitSignUp(e) {
     e.preventDefault();
-    const email = document.getElementById("signup-email").value;
+    const email = document.getElementById("signup-email").value.trim();
     const password = document.getElementById("signup-password").value;
-    const shop_name = document.getElementById("signup-shop").value;
-    const address = document.getElementById("signup-address").value;
+    const shop_name = document.getElementById("signup-shop").value.trim();
+    const address = document.getElementById("signup-address").value.trim();
     const account_type = document.getElementById("signup-account-type").value;
     const errorEl = document.getElementById("signup-error");
-    const successEl = document.getElementById("signup-success");
+    
+    errorEl.style.display = "none";
+
+    try {
+        const res = await fetch("/api/auth/send-otp", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ email })
+        });
+        
+        const data = await res.json();
+        if (res.ok) {
+            // Save pending registration details
+            pendingRegistration = { email, password, shop_name, address, account_type };
+            
+            // Set email text in the OTP panel and clear previous error/input
+            document.getElementById("otp-target-email").innerText = email;
+            document.getElementById("otp-code-input").value = "";
+            document.getElementById("otp-error").style.display = "none";
+            document.getElementById("otp-success").style.display = "none";
+            
+            // Transition modal to OTP state
+            switchAuthTab("otp");
+        } else {
+            errorEl.innerText = data.error || "Failed to send verification email.";
+            errorEl.style.display = "block";
+        }
+    } catch (err) {
+        console.error("OTP send failed:", err);
+        errorEl.innerText = "Connection failed. Please try again.";
+        errorEl.style.display = "block";
+    }
+}
+
+async function submitOTP(e) {
+    e.preventDefault();
+    if (!pendingRegistration) {
+        switchAuthTab("signup");
+        return;
+    }
+
+    const otp = document.getElementById("otp-code-input").value.trim();
+    const errorEl = document.getElementById("otp-error");
+    const successEl = document.getElementById("otp-success");
     
     errorEl.style.display = "none";
     successEl.style.display = "none";
 
     try {
+        const payload = { ...pendingRegistration, otp };
         const res = await fetch("/api/auth/register", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ email, password, shop_name, address, account_type })
+            body: JSON.stringify(payload)
         });
         
         const data = await res.json();
         if (res.ok) {
             successEl.style.display = "block";
             document.getElementById("customer-signup-form").reset();
+            document.getElementById("customer-otp-form").reset();
+            
+            const email = pendingRegistration.email;
+            pendingRegistration = null; // clear cache
+            
             setTimeout(() => {
                 switchAuthTab("signin");
                 document.getElementById("signin-email").value = email;
             }, 1500);
         } else {
-            errorEl.innerText = data.error || "Registration failed.";
+            errorEl.innerText = data.error || "Verification failed.";
             errorEl.style.display = "block";
         }
     } catch (err) {
-        console.error("Registration failed:", err);
+        console.error("Verification failed:", err);
         errorEl.innerText = "Connection failed. Please try again.";
         errorEl.style.display = "block";
     }

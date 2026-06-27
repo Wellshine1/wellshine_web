@@ -35,32 +35,51 @@ async function initDatabase() {
     try {
         // --- STEP 1: CONNECT TO ENGINE AND CREATE DATABASE IF NOT EXIST ---
         if (dbType === 'postgres' || dbType === 'postgresql') {
-            const { Client } = require('pg');
-            const tempClient = new Client({
-                host: dbConfig.host,
-                port: dbConfig.port,
-                user: dbConfig.user,
-                password: dbConfig.password,
-                database: 'postgres'
-            });
-            await tempClient.connect();
-            const res = await tempClient.query("SELECT 1 FROM pg_database WHERE datname = $1", [dbConfig.database]);
-            if (res.rows.length === 0) {
-                console.log(`Database '${dbConfig.database}' not found. Creating it automatically...`);
-                await tempClient.query(`CREATE DATABASE "${dbConfig.database}"`);
-                console.log(`Database '${dbConfig.database}' created.`);
-            }
-            await tempClient.end();
+            const { Client, Pool } = require('pg');
+            const connectionString = process.env.DATABASE_URL;
 
-            // Establish PG Pool on the target database
-            const { Pool } = require('pg');
-            pool = new Pool({
-                host: dbConfig.host,
-                port: dbConfig.port,
-                user: dbConfig.user,
-                password: dbConfig.password,
-                database: dbConfig.database
-            });
+            if (connectionString) {
+                console.log("Connecting to PostgreSQL using DATABASE_URL...");
+                const sslConfig = !connectionString.includes('localhost') && !connectionString.includes('127.0.0.1')
+                    ? { rejectUnauthorized: false }
+                    : false;
+
+                pool = new Pool({
+                    connectionString,
+                    ssl: sslConfig
+                });
+            } else {
+                const sslConfig = dbConfig.host !== 'localhost' && dbConfig.host !== '127.0.0.1'
+                    ? { rejectUnauthorized: false }
+                    : false;
+
+                const tempClient = new Client({
+                    host: dbConfig.host,
+                    port: dbConfig.port,
+                    user: dbConfig.user,
+                    password: dbConfig.password,
+                    database: 'postgres',
+                    ssl: sslConfig
+                });
+                await tempClient.connect();
+                const res = await tempClient.query("SELECT 1 FROM pg_database WHERE datname = $1", [dbConfig.database]);
+                if (res.rows.length === 0) {
+                    console.log(`Database '${dbConfig.database}' not found. Creating it automatically...`);
+                    await tempClient.query(`CREATE DATABASE "${dbConfig.database}"`);
+                    console.log(`Database '${dbConfig.database}' created.`);
+                }
+                await tempClient.end();
+
+                // Establish PG Pool on the target database
+                pool = new Pool({
+                    host: dbConfig.host,
+                    port: dbConfig.port,
+                    user: dbConfig.user,
+                    password: dbConfig.password,
+                    database: dbConfig.database,
+                    ssl: sslConfig
+                });
+            }
         } else {
             // Default to MySQL
             const mysql = require('mysql2/promise');
@@ -176,6 +195,13 @@ async function setupTables() {
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
             )
         `);
+        await query(`
+            CREATE TABLE IF NOT EXISTS otp_verifications (
+                email VARCHAR(255) PRIMARY KEY,
+                otp_code VARCHAR(6) NOT NULL,
+                expires_at TIMESTAMP NOT NULL
+            )
+        `);
     } else {
         await query(`
             CREATE TABLE IF NOT EXISTS orders (
@@ -197,6 +223,13 @@ async function setupTables() {
                 address TEXT NOT NULL,
                 account_type VARCHAR(50) DEFAULT 'Business',
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            )
+        `);
+        await query(`
+            CREATE TABLE IF NOT EXISTS otp_verifications (
+                email VARCHAR(255) PRIMARY KEY,
+                otp_code VARCHAR(6) NOT NULL,
+                expires_at TIMESTAMP NOT NULL
             )
         `);
     }
@@ -231,15 +264,23 @@ async function setupTables() {
 }
 
 async function seedProducts() {
+    // Delete all existing cashews to ensure we only have the new cashew list
+    try {
+        await query("DELETE FROM products WHERE cat = 'Cashew'");
+        console.log("Cleared existing cashews from database for fresh sync.");
+    } catch (err) {
+        console.error("Error clearing existing cashews:", err);
+    }
+
     const seedList = [
         // --- CATEGORY: CASHEWS ---
-        { id: 1, name: "Kerala Cashews (Roasted & Salted)", price: 850, unit: "kg", tag: "Premium Quality", cat: "Cashew", img: "pics/products/croast.jpg", desc: "Premium grade whole cashews, dry-roasted and lightly salted for a crunchy snack." },
-        { id: 2, name: "Kerala Cashews (Gold Nugget)", price: 920, unit: "kg", tag: "Natural Premium", cat: "Cashew", img: "pics/products/cgold.jpg", desc: "Golden-white whole cashews, rich in natural oils, graded to perfection." },
-        { id: 3, name: "Fresh Cashew Nuts (Whole Bulk)", price: 780, unit: "kg", tag: "Fresh Grade A", cat: "Cashew", img: "pics/products/cashew-fresh.jpg", desc: "Raw bulk whole cashews suitable for baking, roasting, or culinary applications." },
-        { id: 4, name: "CDC Cashews (W240 Splits)", price: 640, unit: "kg", tag: "Govt. Grade Splits", cat: "Cashew", img: "pics/products/cashew-splits.jpg", desc: "Split cashew nuts graded W240, official Cashew Development Corp supply." },
-        { id: 40, name: "CDC Cashews (W320 Grade)", price: 377, unit: "250g", tag: "Premium Whole", cat: "Cashew", img: "pics/products/cashew-1.jpg", desc: "W320 premium whole cashew kernels in a retail-friendly 250g pouch." },
-        { id: 41, name: "CDC Cashews (W240 Grade - 250g)", price: 425, unit: "250g", tag: "Govt. Grade Whole", cat: "Cashew", img: "pics/products/cashew-2.jpg", desc: "Premium whole cashew nuts W240 size, certified government grade, 250g pack." },
-        { id: 42, name: "CDC Cashews (W240 Grade - 500g)", price: 837, unit: "500g", tag: "Govt. Grade Whole", cat: "Cashew", img: "pics/products/cashew-2.jpg", desc: "Premium whole cashew nuts W240 size, certified government grade, bulk 500g pack." },
+        { id: 1, name: "Split Cashew (Grade 52)", price: 1190, unit: "kg", tag: "Premium Splits", cat: "Cashew", img: "pics/products/split_cashew.jpg", desc: "Premium quality split cashew nuts, grade 52, perfect for culinary and snacking use." },
+        { id: 2, name: "Fresh Cashew (Grade W240)", price: 735, unit: "500g", tag: "Fresh Grade W240", cat: "Cashew", img: "pics/products/cashew-2.jpg", desc: "Fresh whole cashew nuts of premium W240 grade, carefully packed in 500g packs." },
+        { id: 3, name: "Cashew (Grade W320 - 250g)", price: 350, unit: "250g", tag: "Grade W320", cat: "Cashew", img: "pics/products/w320_250g.jpg", desc: "Premium whole cashew nuts, grade W320, packed in a 250g bag." },
+        { id: 4, name: "Cashew (Grade W320 - 500g)", price: 700, unit: "500g", tag: "Grade W320", cat: "Cashew", img: "pics/products/w320_500g.jpg", desc: "Premium whole cashew nuts, grade W320, packed in a 500g bag." },
+        { id: 40, name: "Cashew Gold Nuggets", price: 377, unit: "250g", tag: "Gold Nuggets", cat: "Cashew", img: "pics/products/cgold.jpg", desc: "Golden-white premium cashews, rich in flavor and quality." },
+        { id: 41, name: "Cashew Roasted & Salted", price: 425, unit: "250g", tag: "Roasted & Salted", cat: "Cashew", img: "pics/products/croast.jpg", desc: "Delicious dry-roasted cashews, lightly salted for a perfect crunchy taste." },
+        { id: 42, name: "Broken Cashew (Grade BB)", price: 910, unit: "kg", tag: "Grade BB", cat: "Cashew", img: "pics/products/broken_cashew_BB.jpg", desc: "Broken cashew nuts, grade BB, ideal for confectionery and baking." },
 
         // --- CATEGORY: DRY FRUITS & SEEDS ---
         { id: 5, name: "Dried Amla (1st Grade)", price: 130, unit: "250g", tag: "100% Natural", cat: "Dry Fruits", img: "pics/products/driedamla.jpg", desc: "Sun-dried gooseberries rich in Vitamin C, processed without artificial sweeteners." },
@@ -267,8 +308,8 @@ async function seedProducts() {
         { id: 45, name: "Proso Millet Premium Grain", price: 110, unit: "500g", tag: "Traditional Grain", cat: "Oats & Millets", img: "pics/products/proso-millet.jpg", desc: "Traditional proso millet grain, rich in dietary fiber and lecithin." },
         { id: 46, name: "Kodo Millet Premium Grain", price: 110, unit: "500g", tag: "Traditional Grain", cat: "Oats & Millets", img: "pics/products/kodo-millet.jpg", desc: "High antioxidant Kodo millet grain, perfect substitute for white rice." },
         { id: 21, name: "Mixed Millet Premium Flakes", price: 140, unit: "400g", tag: "Healthy Breakfast", cat: "Oats & Millets", img: "pics/products/millet-flakes.jpg", desc: "Crispy breakfast flakes made from multi-millet grains (ragi, jowar, bajra)." },
-        { id: 22, name: "Nutri Oat Meal (Dia Plus)", price: 236, unit: "400g", tag: "Instant Mix", cat: "Oats & Millets", img: "pics/products/oatmeal-box.jpg", desc: "Dia Plus diabetic-friendly oat meal mix with natural wheat fibers." },
-        { id: 23, name: "Nutri Steel Cut Oats", price: 128, unit: "500g", tag: "Whole Grain", cat: "Oats & Millets", img: "pics/products/steel-cut-oats.jpg", desc: "High fiber steel-cut oat kernels, chewy texture and slow-burning energy." },
+        { id: 22, name: "Nutri DiaPlus Oats", price: 236, unit: "400g", tag: "Instant Mix", cat: "Oats & Millets", img: "pics/products/oatmeal-box.jpg", desc: "Dia Plus diabetic-friendly oat meal mix with natural wheat fibers." },
+        { id: 23, name: "Nutri Steel Cut Oats", price: 293, unit: "kg", tag: "Whole Grain", cat: "Oats & Millets", img: "pics/products/steel-cut-oats.jpg", desc: "High fiber steel-cut oat kernels, chewy texture and slow-burning energy." },
         { id: 24, name: "Foxtail Millet Premium Grain", price: 115, unit: "500g", tag: "Traditional Grain", cat: "Oats & Millets", img: "pics/products/foxtail-millet.jpg", desc: "Foxtail millet grain (Navane) ideal for blood sugar management." },
 
         // --- CATEGORY: SNACKS & BREAKFAST ---
@@ -317,7 +358,20 @@ async function seedProducts() {
 // GET ALL PRODUCTS
 app.get('/api/products', async (req, res) => {
     try {
-        const products = await query('SELECT * FROM products ORDER BY (CASE WHEN stock > 0 THEN 0 ELSE 1 END) ASC, name ASC');
+        const products = await query(`
+            SELECT * FROM products 
+            ORDER BY 
+                (CASE WHEN stock > 0 THEN 0 ELSE 1 END) ASC,
+                (CASE cat 
+                    WHEN 'Cashew' THEN 1 
+                    WHEN 'Dry Fruits' THEN 2 
+                    WHEN 'Oats & Millets' THEN 3 
+                    WHEN 'Snacks & Breakfast' THEN 4 
+                    WHEN 'Spices' THEN 5 
+                    ELSE 6 
+                END) ASC,
+                id ASC
+        `);
         res.json(products);
     } catch (err) {
         console.error(err);
@@ -379,29 +433,140 @@ app.post('/api/orders', requireAuth, async (req, res) => {
 
 // --- USER AUTHENTICATION ENDPOINTS ---
 
-// POST USER SIGNUP
-app.post('/api/auth/register', async (req, res) => {
-    const { email, password, shop_name, address, account_type } = req.body;
-    if (!email || !password || !shop_name || !address) {
-        return res.status(400).json({ error: 'Missing required registration parameters' });
+// Verification email sender helper
+async function sendVerificationEmail(email, otpCode) {
+    const smtpUser = process.env.SMTP_USER;
+    const smtpPass = process.env.SMTP_PASS;
+    const smtpHost = process.env.SMTP_HOST || 'smtp.gmail.com';
+    const smtpPort = parseInt(process.env.SMTP_PORT || '587');
+
+    console.log('\n=============================================================');
+    console.log(`[VERIFICATION CODE] Sent OTP: ${otpCode} to ${email}`);
+    console.log('=============================================================\n');
+
+    if (smtpUser && smtpPass) {
+        try {
+            const nodemailer = require('nodemailer');
+            const transporter = nodemailer.createTransport({
+                host: smtpHost,
+                port: smtpPort,
+                secure: smtpPort === 465,
+                auth: {
+                    user: smtpUser,
+                    pass: smtpPass
+                }
+            });
+
+            const mailOptions = {
+                from: `"Wellshine Distributors" <${smtpUser}>`,
+                to: email,
+                subject: 'Verify Your Wholesale Account - OTP Code',
+                html: `
+                    <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #d4af37; border-radius: 10px; background: #0c0c0c; color: #fff;">
+                        <h2 style="color: #d4af37; border-bottom: 1px solid #d4af37; padding-bottom: 10px;">Wellshine Distributors</h2>
+                        <p>Thank you for registering a wholesale account with us. To verify your email address, please enter the following 6-digit OTP code on the signup screen:</p>
+                        <div style="background: #1a1a1a; border: 1px solid #d4af37; border-radius: 5px; padding: 15px; font-size: 1.8rem; font-weight: bold; letter-spacing: 5px; text-align: center; margin: 20px 0; color: #d4af37;">
+                            ${otpCode}
+                        </div>
+                        <p style="font-size: 0.85rem; color: #aaa;">This code will expire in 5 minutes. If you did not request this code, you can safely ignore this email.</p>
+                    </div>
+                `
+            };
+
+            await transporter.sendMail(mailOptions);
+            console.log(`Email successfully delivered to ${email}`);
+        } catch (err) {
+            console.error(`Nodemailer error sending to ${email}:`, err.message);
+        }
+    } else {
+        console.log(`(SMTP_USER not configured in .env. Running in console-only mock mode.)`);
     }
-    const finalAccountType = account_type === 'Individual' ? 'Individual' : 'Business';
+}
+
+// POST REQUEST OTP
+app.post('/api/auth/send-otp', async (req, res) => {
+    const { email } = req.body;
+    if (!email) {
+        return res.status(400).json({ error: 'Missing email address' });
+    }
 
     try {
-        // Check if user already exists
-        const existing = await query('SELECT id FROM users WHERE email = ?', [email.trim().toLowerCase()]);
+        const cleanEmail = email.trim().toLowerCase();
+        
+        // 1. Check if user already exists
+        const existing = await query('SELECT id FROM users WHERE email = ?', [cleanEmail]);
         if (existing.length > 0) {
             return res.status(400).json({ error: 'An account with this email already exists' });
         }
 
-        // Hash password
+        // 2. Generate random 6-digit code
+        const otpCode = Math.floor(100000 + Math.random() * 900000).toString();
+        const expiresAt = new Date(Date.now() + 5 * 60 * 1000); // 5 minutes expiry
+
+        // 3. Save to otp_verifications (Insert or Replace)
+        const active = await query('SELECT email FROM otp_verifications WHERE email = ?', [cleanEmail]);
+        if (active.length > 0) {
+            await query('UPDATE otp_verifications SET otp_code = ?, expires_at = ? WHERE email = ?', [otpCode, expiresAt, cleanEmail]);
+        } else {
+            await query('INSERT INTO otp_verifications (email, otp_code, expires_at) VALUES (?, ?, ?)', [cleanEmail, otpCode, expiresAt]);
+        }
+
+        // 4. Send the verification code
+        await sendVerificationEmail(cleanEmail, otpCode);
+
+        res.json({ success: true, message: 'Verification OTP sent successfully!' });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: 'Internal Server Error sending OTP' });
+    }
+});
+
+// POST USER SIGNUP
+app.post('/api/auth/register', async (req, res) => {
+    const { email, password, shop_name, address, account_type, otp } = req.body;
+    if (!email || !password || !shop_name || !address || !otp) {
+        return res.status(400).json({ error: 'Missing required registration parameters (including OTP)' });
+    }
+    const finalAccountType = account_type === 'Individual' ? 'Individual' : 'Business';
+    const cleanEmail = email.trim().toLowerCase();
+
+    try {
+        // 1. Check if user already exists
+        const existing = await query('SELECT id FROM users WHERE email = ?', [cleanEmail]);
+        if (existing.length > 0) {
+            return res.status(400).json({ error: 'An account with this email already exists' });
+        }
+
+        // 2. Verify OTP
+        const otpRecord = await query('SELECT * FROM otp_verifications WHERE email = ?', [cleanEmail]);
+        if (otpRecord.length === 0) {
+            return res.status(400).json({ error: 'No verification request found for this email' });
+        }
+
+        const { otp_code, expires_at } = otpRecord[0];
+        
+        // Check if code matches
+        if (otp_code !== otp.trim()) {
+            return res.status(400).json({ error: 'Invalid verification code' });
+        }
+
+        // Check expiry
+        const expiryTime = new Date(expires_at).getTime();
+        if (Date.now() > expiryTime) {
+            return res.status(400).json({ error: 'Verification code has expired' });
+        }
+
+        // 3. Hash password
         const passwordHash = await bcrypt.hash(password, 10);
 
-        // Insert into database
+        // 4. Insert user into database
         await query(
             'INSERT INTO users (email, password_hash, shop_name, address, account_type) VALUES (?, ?, ?, ?, ?)',
-            [email.trim().toLowerCase(), passwordHash, shop_name.trim(), address.trim(), finalAccountType]
+            [cleanEmail, passwordHash, shop_name.trim(), address.trim(), finalAccountType]
         );
+
+        // 5. Clean up OTP record
+        await query('DELETE FROM otp_verifications WHERE email = ?', [cleanEmail]);
 
         res.status(201).json({ success: true, message: 'User account created successfully!' });
     } catch (err) {
@@ -607,6 +772,41 @@ app.post('/api/admin/orders/confirm', requireAdmin, async (req, res) => {
     } catch (err) {
         console.error(err);
         res.status(500).json({ error: 'Internal Server Error confirming order' });
+    }
+});
+
+// UPDATE PRODUCT DETAILS (Name, price, category, unit, tag, img, description)
+app.post('/api/admin/products/update', requireAdmin, async (req, res) => {
+    const { productId, name, price, unit, tag, cat, img, description, stock } = req.body;
+    if (productId === undefined) {
+        return res.status(400).json({ error: 'Missing productId' });
+    }
+    try {
+        const parsedId = parseInt(productId);
+        const fields = [];
+        const params = [];
+
+        if (name !== undefined) { fields.push('name = ?'); params.push(name); }
+        if (price !== undefined) { fields.push('price = ?'); params.push(parseInt(price)); }
+        if (unit !== undefined) { fields.push('unit = ?'); params.push(unit); }
+        if (tag !== undefined) { fields.push('tag = ?'); params.push(tag); }
+        if (cat !== undefined) { fields.push('cat = ?'); params.push(cat); }
+        if (img !== undefined) { fields.push('img = ?'); params.push(img); }
+        if (description !== undefined) { fields.push('description = ?'); params.push(description); }
+        if (stock !== undefined) { fields.push('stock = ?'); params.push(parseInt(stock)); }
+
+        if (fields.length === 0) {
+            return res.status(400).json({ error: 'No fields to update' });
+        }
+
+        params.push(parsedId);
+        const updateQuery = `UPDATE products SET ${fields.join(', ')} WHERE id = ?`;
+        await query(updateQuery, params);
+
+        res.json({ success: true, message: 'Product updated successfully' });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: 'Internal Server Error updating product details' });
     }
 });
 
