@@ -303,7 +303,8 @@ body {
 .main-prod-img { 
     width: 100%; 
     height: 100%; 
-    object-fit: cover; 
+    object-fit: contain; 
+    padding: 10px;
     transition: 0.5s ease;
 }
 .item-card-pro:hover .main-prod-img {
