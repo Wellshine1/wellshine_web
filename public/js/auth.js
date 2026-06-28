@@ -374,7 +374,7 @@ function injectAuthModal() {
                         <i class="fas fa-map-marker-alt auth-input-icon"></i>
                         <textarea id="signup-address" placeholder="Full Billing/Delivery Address" rows="2" required></textarea>
                     </div>
-                    <button type="submit" class="auth-submit-btn">Send OTP Code</button>
+                    <button type="submit" class="auth-submit-btn">Create Account</button>
                     <div class="auth-error" id="signup-error"></div>
                     <div class="auth-success-msg" id="signup-success">Account created! Switch to Sign In to login.</div>
                 </form>
@@ -630,35 +630,34 @@ async function submitSignUp(e) {
     const address = document.getElementById("signup-address").value.trim();
     const account_type = document.getElementById("signup-account-type").value;
     const errorEl = document.getElementById("signup-error");
+    const successEl = document.getElementById("signup-success");
     
     errorEl.style.display = "none";
+    if (successEl) successEl.style.display = "none";
 
     try {
-        const res = await fetch("/api/auth/send-otp", {
+        const res = await fetch("/api/auth/register", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ email })
+            body: JSON.stringify({ email, password, shop_name, address, account_type })
         });
         
         const data = await res.json();
         if (res.ok) {
-            // Save pending registration details
-            pendingRegistration = { email, password, shop_name, address, account_type };
+            if (successEl) successEl.style.display = "block";
+            document.getElementById("customer-signup-form").reset();
             
-            // Set email text in the OTP panel and clear previous error/input
-            document.getElementById("otp-target-email").innerText = email;
-            document.getElementById("otp-code-input").value = "";
-            document.getElementById("otp-error").style.display = "none";
-            document.getElementById("otp-success").style.display = "none";
-            
-            // Transition modal to OTP state
-            switchAuthTab("otp");
+            setTimeout(() => {
+                switchAuthTab("signin");
+                document.getElementById("signin-email").value = email;
+                if (successEl) successEl.style.display = "none";
+            }, 2000);
         } else {
-            errorEl.innerText = data.error || "Failed to send verification email.";
+            errorEl.innerText = data.error || "Failed to create account.";
             errorEl.style.display = "block";
         }
     } catch (err) {
-        console.error("OTP send failed:", err);
+        console.error("Sign up failed:", err);
         errorEl.innerText = "Connection failed. Please try again.";
         errorEl.style.display = "block";
     }

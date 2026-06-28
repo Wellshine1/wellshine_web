@@ -440,6 +440,7 @@ app.post('/api/orders', requireAuth, async (req, res) => {
 
 // Verification email sender helper
 async function sendVerificationEmail(email, otpCode) {
+    const resendApiKey = process.env.RESEND_API_KEY;
     const smtpUser = process.env.SMTP_USER;
     const smtpPass = process.env.SMTP_PASS;
     const smtpHost = process.env.SMTP_HOST || 'smtp.gmail.com';
@@ -449,7 +450,63 @@ async function sendVerificationEmail(email, otpCode) {
     console.log(`[VERIFICATION CODE] Sent OTP: ${otpCode} to ${email}`);
     console.log('=============================================================\n');
 
-    if (smtpUser && smtpPass) {
+    const htmlContent = `
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #d4af37; border-radius: 10px; background: #0c0c0c; color: #fff;">
+            <h2 style="color: #d4af37; border-bottom: 1px solid #d4af37; padding-bottom: 10px;">Wellshine Distributors</h2>
+            <p>Thank you for registering a wholesale account with us. To verify your email address, please enter the following 6-digit OTP code on the signup screen:</p>
+            <div style="background: #1a1a1a; border: 1px solid #d4af37; border-radius: 5px; padding: 15px; font-size: 1.8rem; font-weight: bold; letter-spacing: 5px; text-align: center; margin: 20px 0; color: #d4af37;">
+                ${otpCode}
+            </div>
+            <p style="font-size: 0.85rem; color: #aaa;">This code will expire in 5 minutes. If you did not request this code, you can safely ignore this email.</p>
+        </div>
+    `;
+
+    if (resendApiKey) {
+        // Use Resend HTTP API (works on Render free tier because it uses port 443/HTTPS)
+        try {
+            const https = require('https');
+            const data = JSON.stringify({
+                from: 'Wellshine Distributors <onboarding@resend.dev>',
+                to: email,
+                subject: 'Verify Your Wholesale Account - OTP Code',
+                html: htmlContent
+            });
+
+            const options = {
+                hostname: 'api.resend.com',
+                port: 443,
+                path: '/emails',
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${resendApiKey}`,
+                    'Content-Length': Buffer.byteLength(data)
+                }
+            };
+
+            const req = https.request(options, (res) => {
+                let responseBody = '';
+                res.on('data', (chunk) => { responseBody += chunk; });
+                res.on('end', () => {
+                    if (res.statusCode >= 200 && res.statusCode < 300) {
+                        console.log(`Email successfully delivered via Resend HTTP API to ${email}`);
+                    } else {
+                        console.error(`Resend API error: Status ${res.statusCode}, Response: ${responseBody}`);
+                    }
+                });
+            });
+
+            req.on('error', (e) => {
+                console.error(`Resend request error sending to ${email}:`, e.message);
+            });
+
+            req.write(data);
+            req.end();
+        } catch (err) {
+            console.error(`Resend configuration error sending to ${email}:`, err.message);
+        }
+    } else if (smtpUser && smtpPass) {
+        // Fallback to traditional SMTP
         try {
             // Resolve hostname to IPv4 address to bypass Render's IPv6 outbound limitations
             let targetHost = smtpHost;
@@ -484,25 +541,16 @@ async function sendVerificationEmail(email, otpCode) {
                 from: `"Wellshine Distributors" <${smtpUser}>`,
                 to: email,
                 subject: 'Verify Your Wholesale Account - OTP Code',
-                html: `
-                    <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #d4af37; border-radius: 10px; background: #0c0c0c; color: #fff;">
-                        <h2 style="color: #d4af37; border-bottom: 1px solid #d4af37; padding-bottom: 10px;">Wellshine Distributors</h2>
-                        <p>Thank you for registering a wholesale account with us. To verify your email address, please enter the following 6-digit OTP code on the signup screen:</p>
-                        <div style="background: #1a1a1a; border: 1px solid #d4af37; border-radius: 5px; padding: 15px; font-size: 1.8rem; font-weight: bold; letter-spacing: 5px; text-align: center; margin: 20px 0; color: #d4af37;">
-                            ${otpCode}
-                        </div>
-                        <p style="font-size: 0.85rem; color: #aaa;">This code will expire in 5 minutes. If you did not request this code, you can safely ignore this email.</p>
-                    </div>
-                `
+                html: htmlContent
             };
 
             await transporter.sendMail(mailOptions);
-            console.log(`Email successfully delivered to ${email}`);
+            console.log(`Email successfully delivered via SMTP to ${email}`);
         } catch (err) {
             console.error(`Nodemailer error sending to ${email}:`, err.message);
         }
     } else {
-        console.log(`(SMTP_USER not configured in .env. Running in console-only mock mode.)`);
+        console.log(`(SMTP_USER and RESEND_API_KEY not configured. Running in console-only mock mode.)`);
     }
 }
 
@@ -546,9 +594,9 @@ app.post('/api/auth/send-otp', async (req, res) => {
 
 // POST USER SIGNUP
 app.post('/api/auth/register', async (req, res) => {
-    const { email, password, shop_name, address, account_type, otp } = req.body;
-    if (!email || !password || !shop_name || !address || !otp) {
-        return res.status(400).json({ error: 'Missing required registration parameters (including OTP)' });
+    const { email, password, shop_name, address, account_type } = req.body;
+    if (!email || !password || !shop_name || !address) {
+        return res.status(400).json({ error: 'Missing required registration parameters' });
     }
     const finalAccountType = account_type === 'Individual' ? 'Individual' : 'Business';
     const cleanEmail = email.trim().toLowerCase();
@@ -560,26 +608,7 @@ app.post('/api/auth/register', async (req, res) => {
             return res.status(400).json({ error: 'An account with this email already exists' });
         }
 
-        // 2. Verify OTP
-        const otpRecord = await query('SELECT * FROM otp_verifications WHERE email = ?', [cleanEmail]);
-        if (otpRecord.length === 0) {
-            return res.status(400).json({ error: 'No verification request found for this email' });
-        }
-
-        const { otp_code, expires_at } = otpRecord[0];
-        
-        // Check if code matches
-        if (otp_code !== otp.trim()) {
-            return res.status(400).json({ error: 'Invalid verification code' });
-        }
-
-        // Check expiry
-        const expiryTime = new Date(expires_at).getTime();
-        if (Date.now() > expiryTime) {
-            return res.status(400).json({ error: 'Verification code has expired' });
-        }
-
-        // 3. Hash password
+        // 2. Hash password
         const passwordHash = await bcrypt.hash(password, 10);
 
         // 4. Insert user into database
