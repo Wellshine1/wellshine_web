@@ -451,11 +451,29 @@ async function sendVerificationEmail(email, otpCode) {
 
     if (smtpUser && smtpPass) {
         try {
+            // Resolve hostname to IPv4 address to bypass Render's IPv6 outbound limitations
+            let targetHost = smtpHost;
+            if (/[a-zA-Z]/.test(smtpHost)) {
+                try {
+                    const dnsPromises = require('dns').promises;
+                    const addresses = await dnsPromises.resolve4(smtpHost);
+                    if (addresses.length > 0) {
+                        targetHost = addresses[0];
+                        console.log(`Resolved ${smtpHost} to IPv4: ${targetHost}`);
+                    }
+                } catch (dnsErr) {
+                    console.error(`DNS resolve4 failed for ${smtpHost}, falling back to hostname:`, dnsErr.message);
+                }
+            }
+
             const nodemailer = require('nodemailer');
             const transporter = nodemailer.createTransport({
-                host: smtpHost,
+                host: targetHost,
                 port: smtpPort,
                 secure: smtpPort === 465,
+                tls: {
+                    servername: smtpHost // Required for SSL certificate check when using an IP address
+                },
                 auth: {
                     user: smtpUser,
                     pass: smtpPass
