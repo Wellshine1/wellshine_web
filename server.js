@@ -511,8 +511,8 @@ app.post('/api/auth/send-otp', async (req, res) => {
             await query('INSERT INTO otp_verifications (email, otp_code, expires_at) VALUES (?, ?, ?)', [cleanEmail, otpCode, expiresAt]);
         }
 
-        // 4. Send the verification code
-        await sendVerificationEmail(cleanEmail, otpCode);
+        // 4. Send the verification code (asynchronously in background for instant response)
+        sendVerificationEmail(cleanEmail, otpCode);
 
         res.json({ success: true, message: 'Verification OTP sent successfully!' });
     } catch (err) {
