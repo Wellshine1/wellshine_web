@@ -64,71 +64,7 @@
             
             <div class="carousel-track-wrapper">
                 <div class="carousel-track" id="carousel-track">
-                    
-                    <!-- Slide 1: CDC Cashews -->
-                    <div class="carousel-slide active">
-                        <div class="slide-grid">
-                            <div class="slide-img-side">
-                                <img src="pics/products/cashew-2.jpg" alt="CDC Cashews W240" onerror="this.src='pics/products/croast.jpg'">
-                            </div>
-                            <div class="slide-info-side">
-                                <span class="slide-tag">Govt. Certified</span>
-                                <h3 class="slide-title">CDC Cashews (W240 Grade)</h3>
-                                <p class="slide-desc">Enjoy whole cashew kernels sourced directly from the Cashew Development Corporation (Govt. of Kerala). Crisp, premium quality, and packed under certified conditions.</p>
-                                <p class="slide-price">₹425 <span class="unit-label">/ 250g</span></p>
-                                <button class="slide-btn" onclick="location.href='products.html'">View in Showcase</button>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <!-- Slide 2: Mixed Dry Fruits Rectangular Tray -->
-                    <div class="carousel-slide">
-                        <div class="slide-grid">
-                            <div class="slide-img-side">
-                                <img src="pics/products/mixed-dry-fruits-rect.jpg" alt="Premium Mixed Dry Fruits" onerror="this.src='pics/products/mdryfruit.jpg'">
-                            </div>
-                            <div class="slide-info-side">
-                                <span class="slide-tag">Exquisite Gift Tray</span>
-                                <h3 class="slide-title">Mixed Premium Dry Fruits (400g)</h3>
-                                <p class="slide-desc">A premium rectangular partition tray packed with high-grade almonds, cashews, pistachios, dates, kiwi slices, and dehydrated mango. Ideal for gifting or sharing.</p>
-                                <p class="slide-price">₹599 <span class="unit-label">/ 400g</span></p>
-                                <button class="slide-btn" onclick="location.href='products.html'">View in Showcase</button>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <!-- Slide 3: Dried Jackfruit -->
-                    <div class="carousel-slide">
-                        <div class="slide-grid">
-                            <div class="slide-img-side">
-                                <img src="pics/products/dried-jackfruit-pack.jpg" alt="Dried Jackfruit Slices" onerror="this.src='pics/products/jackfruit-chips.jpg'">
-                            </div>
-                            <div class="slide-info-side">
-                                <span class="slide-tag">100% Natural Sweet</span>
-                                <h3 class="slide-title">Dried Jackfruits (Chakka Slices)</h3>
-                                <p class="slide-desc">Handpicked local yellow jackfruit slices, naturally sun-dehydrated and vacuum sealed without any artificial sweeteners or chemical preservatives. Nutrient-rich and chewy.</p>
-                                <p class="slide-price">₹450 <span class="unit-label">/ 500g</span></p>
-                                <button class="slide-btn" onclick="location.href='products.html'">View in Showcase</button>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <!-- Slide 4: Arrowroot Powder -->
-                    <div class="carousel-slide">
-                        <div class="slide-grid">
-                            <div class="slide-img-side">
-                                <img src="pics/products/arrowroot.jpg" alt="Arrowroot Powder" onerror="this.src='pics/products/croast.jpg'">
-                            </div>
-                            <div class="slide-info-side">
-                                <span class="slide-tag">Traditional Healing Food</span>
-                                <h3 class="slide-title">Premium Arrowroot Powder</h3>
-                                <p class="slide-desc">100% organic, sun-dried traditional arrowroot powder (Koova Podi). Well-known in Kerala for its cooling properties and soothing effects on digestion.</p>
-                                <p class="slide-price">₹600 <span class="unit-label">/ 500g</span></p>
-                                <button class="slide-btn" onclick="location.href='products.html'">View in Showcase</button>
-                            </div>
-                        </div>
-                    </div>
-                    
+                    <!-- Populated dynamically -->
                 </div>
             </div>
             
@@ -137,11 +73,8 @@
         </div>
         
         <!-- Navigation Dots -->
-        <div class="carousel-dots">
-            <span class="dot active" onclick="setSlide(0)"></span>
-            <span class="dot" onclick="setSlide(1)"></span>
-            <span class="dot" onclick="setSlide(2)"></span>
-            <span class="dot" onclick="setSlide(3)"></span>
+        <div class="carousel-dots" id="carousel-dots">
+            <!-- Populated dynamically -->
         </div>
     </section>
 
@@ -245,6 +178,67 @@
             }, 5000);
         }
 
+        async function loadBestsellers() {
+            try {
+                const response = await fetch('/api/products');
+                if (!response.ok) return;
+                const products = await response.json();
+                
+                // Filter bestsellers
+                let bestsellers = products.filter(p => parseInt(p.is_bestseller) === 1);
+                
+                // Fallback: if no products are marked, display first 4
+                if (bestsellers.length === 0) {
+                    bestsellers = products.slice(0, 4);
+                }
+                
+                const track = document.getElementById('carousel-track');
+                const dotsContainer = document.getElementById('carousel-dots');
+                if (!track || !dotsContainer) return;
+                
+                track.innerHTML = bestsellers.map((item, index) => {
+                    const hasDiscount = item.discount_percent > 0;
+                    const triggerQty = parseInt(item.discount_trigger_qty) || 1;
+                    const isDiscountUnlocked = hasDiscount && triggerQty === 1;
+                    const finalPrice = hasDiscount ? Math.round(item.price * (1 - item.discount_percent / 100)) : item.price;
+                    
+                    let priceHTML = '';
+                    if (isDiscountUnlocked) {
+                        priceHTML = `<span class="price-original-slashed" style="text-decoration: line-through; opacity: 0.5; margin-right: 8px;">₹${item.price}</span> ₹${finalPrice}`;
+                    } else {
+                        priceHTML = `₹${item.price}`;
+                    }
+                    
+                    return `
+                        <div class="carousel-slide ${index === 0 ? 'active' : ''}">
+                            <div class="slide-grid">
+                                <div class="slide-img-side">
+                                    <img src="${item.img}" alt="${item.name}" onerror="this.src='pics/products/croast.jpg'">
+                                </div>
+                                <div class="slide-info-side">
+                                    <span class="slide-tag">${item.tag || 'Bestseller'}</span>
+                                    <h3 class="slide-title">${item.name}</h3>
+                                    <p class="slide-desc">${item.description || 'Premium select wholesale item, sourced from traditional agricultural hubs.'}</p>
+                                    <p class="slide-price" style="font-size: 1.4rem; font-weight: 700; color: var(--gold); margin: 10px 0;">
+                                        ${priceHTML} <span class="unit-label" style="font-size: 0.9rem; font-weight: normal; color: #ccc;">/ ${item.unit}</span>
+                                    </p>
+                                    <button class="slide-btn" onclick="location.href='products.html'">View in Showcase</button>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+                
+                dotsContainer.innerHTML = bestsellers.map((_, index) => `
+                    <span class="dot ${index === 0 ? 'active' : ''}" onclick="setSlide(${index})"></span>
+                `).join('');
+                
+                initCarousel();
+            } catch (err) {
+                console.error("Error loading bestsellers:", err);
+            }
+        }
+
         // --- THEME ENGINE ---
         function updateThemeIcon() {
             const icon = document.querySelector('#theme-toggle i');
@@ -258,8 +252,7 @@
         }
 
         document.addEventListener('DOMContentLoaded', () => {
-            // Init Carousel elements
-            initCarousel();
+            loadBestsellers();
 
             // Navigation Shop Dropdown toggle
             const dropdownToggle = document.querySelector('.dropdown-toggle');

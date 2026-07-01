@@ -224,6 +224,7 @@ function renderInventoryTable(items) {
             badgeText = `Low: ${stock}`;
         }
         
+        const isBestseller = parseInt(item.is_bestseller) === 1;
         return `
             <tr id="inv-row-${item.id}">
                 <td><strong>#${item.id}</strong></td>
@@ -231,7 +232,10 @@ function renderInventoryTable(items) {
                     <div class="prod-info-cell">
                         <img src="${item.img}" onerror="this.src='pics/products/croast.jpg'">
                         <div>
-                            <div class="prod-name-title">${item.name}</div>
+                            <div class="prod-name-title" style="display: flex; align-items: center; gap: 6px;">
+                                ${item.name}
+                                ${isBestseller ? `<span style="background:rgba(212, 175, 55, 0.15); color:var(--gold); font-size:0.65rem; padding:1px 6px; border-radius:6px; font-weight:700;"><i class="fas fa-star"></i> Bestseller</span>` : ''}
+                            </div>
                             <span class="prod-meta-label">${item.tag}</span>
                         </div>
                     </div>
@@ -281,6 +285,7 @@ window.openEditModal = function(id) {
     document.getElementById('edit-product-price').value = item.price;
     document.getElementById('edit-product-discount').value = item.discount_percent || 0;
     document.getElementById('edit-product-discount-trigger').value = item.discount_trigger_qty || 1;
+    document.getElementById('edit-product-bestseller').checked = parseInt(item.is_bestseller) === 1;
     document.getElementById('edit-product-unit').value = item.unit;
     document.getElementById('edit-product-tag').value = item.tag;
     document.getElementById('edit-product-img').value = item.img;
@@ -312,6 +317,7 @@ window.saveProductDetails = async function(event) {
     const price = parseInt(document.getElementById('edit-product-price').value);
     const discount_percent = parseInt(document.getElementById('edit-product-discount').value) || 0;
     const discount_trigger_qty = parseInt(document.getElementById('edit-product-discount-trigger').value) || 1;
+    const is_bestseller = document.getElementById('edit-product-bestseller').checked ? 1 : 0;
     const unit = document.getElementById('edit-product-unit').value.trim();
     const tag = document.getElementById('edit-product-tag').value.trim();
     const img = document.getElementById('edit-product-img').value.trim();
@@ -331,6 +337,7 @@ window.saveProductDetails = async function(event) {
                 price,
                 discount_percent,
                 discount_trigger_qty,
+                is_bestseller,
                 unit,
                 tag,
                 img,
@@ -348,6 +355,7 @@ window.saveProductDetails = async function(event) {
                 originalItem.price = price;
                 originalItem.discount_percent = discount_percent;
                 originalItem.discount_trigger_qty = discount_trigger_qty;
+                originalItem.is_bestseller = is_bestseller;
                 originalItem.unit = unit;
                 originalItem.tag = tag;
                 originalItem.img = img;
@@ -1070,6 +1078,7 @@ window.openAddModal = function() {
     document.getElementById('add-product-price').value = '';
     document.getElementById('add-product-discount').value = '0';
     document.getElementById('add-product-discount-trigger').value = '1';
+    document.getElementById('add-product-bestseller').checked = false;
     document.getElementById('add-product-unit').value = '';
     document.getElementById('add-product-stock').value = '50';
     document.getElementById('add-product-tag').value = 'Premium Quality';
@@ -1098,6 +1107,7 @@ window.saveNewProduct = async function(event) {
     const price = parseInt(document.getElementById('add-product-price').value);
     const discount_percent = parseInt(document.getElementById('add-product-discount').value) || 0;
     const discount_trigger_qty = parseInt(document.getElementById('add-product-discount-trigger').value) || 1;
+    const is_bestseller = document.getElementById('add-product-bestseller').checked ? 1 : 0;
     const unit = document.getElementById('add-product-unit').value.trim();
     const stock = parseInt(document.getElementById('add-product-stock').value) || 0;
     const tag = document.getElementById('add-product-tag').value.trim();
@@ -1117,6 +1127,7 @@ window.saveNewProduct = async function(event) {
                 price,
                 discount_percent,
                 discount_trigger_qty,
+                is_bestseller,
                 unit,
                 stock,
                 tag,
