@@ -416,15 +416,7 @@ window.openQuickView = function(id) {
                 <div class="qv-details-side">
                     <span class="tag-label" style="font-size: 0.75rem;">${item.tag}</span>
                     <h2 class="qv-title">${item.name}</h2>
-                    <p class="qv-price">
-                        ${hasDiscount ? `
-                            <span class="price-original-slashed" style="font-size: 1.1rem; margin-right: 8px;">₹${item.price}</span>
-                            <span class="price-discounted" style="font-size: 1.7rem; color: #ff1744; font-weight: 700;">₹${finalPrice}</span>
-                        ` : `
-                            ₹${item.price}
-                        `}
-                        <span class="unit-label">/ ${item.unit}</span>
-                    </p>
+                    <div id="qv-price-container-${item.id}"></div>
                     
                     <div class="qv-meta-box">
                         <p><strong>Category:</strong> ${item.cat}</p>
@@ -481,6 +473,52 @@ function renderQuickViewQty(id) {
     }
 
     const cartItem = cart.find(c => c.id === id);
+    const quantity = cartItem ? cartItem.quantity : 0;
+
+    // Dynamically update the price and subtotal inside Quick View modal!
+    const priceContainer = document.getElementById(`qv-price-container-${id}`);
+    if (priceContainer) {
+        const triggerQty = parseInt(item.discount_trigger_qty) || 1;
+        const hasDiscount = item.discount_percent > 0;
+        const isUnlocked = hasDiscount && quantity >= triggerQty;
+        const currentUnitPrice = isUnlocked ? Math.round(item.price * (1 - item.discount_percent / 100)) : item.price;
+        const subtotal = currentUnitPrice * quantity;
+
+        let priceHTML = '';
+        if (hasDiscount) {
+            if (isUnlocked) {
+                priceHTML = `
+                    <span class="price-original-slashed" style="font-size: 1.1rem; margin-right: 8px;">₹${item.price}</span>
+                    <span class="price-discounted" style="font-size: 1.7rem; color: #ff1744; font-weight: 700;">₹${currentUnitPrice}</span>
+                `;
+            } else {
+                priceHTML = `
+                    <span class="price-discounted" style="font-size: 1.7rem; color: #fff; font-weight: 700;">₹${item.price}</span>
+                    <span style="font-size: 0.8rem; color: #ff1744; margin-left: 8px; font-weight: 700;">(Buy ${triggerQty}+ to get ${item.discount_percent}% OFF)</span>
+                `;
+            }
+        } else {
+            priceHTML = `₹${item.price}`;
+        }
+
+        let subtotalHTML = '';
+        if (quantity > 0) {
+            subtotalHTML = `
+                <div style="margin-top: 10px; font-size: 1.1rem; font-weight: 700; color: var(--gold);">
+                    Subtotal (${quantity} ${quantity > 1 ? 'units' : 'unit'}): ₹${subtotal}
+                </div>
+            `;
+        }
+
+        priceContainer.innerHTML = `
+            <p class="qv-price" style="margin:0;">
+                ${priceHTML}
+                <span class="unit-label">/ ${item.unit}</span>
+            </p>
+            ${subtotalHTML}
+        `;
+    }
+
     if (cartItem) {
         actionArea.innerHTML = `
             <div class="qv-qty-controls">
