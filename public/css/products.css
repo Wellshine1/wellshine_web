@@ -28,8 +28,8 @@
     --body-bg: #f7f5f0;
     --body-text: #1b3322;
     --body-text-muted: #5e6f62;
-    --bg-overlay: rgba(247, 245, 240, 0.7);
-    --hero-overlay: rgba(247, 245, 240, 0.9);
+    --bg-overlay: rgba(247, 245, 240, 0.3);
+    --hero-overlay: rgba(247, 245, 240, 0.25);
     --card-hover: rgba(27, 51, 34, 0.03);
     --dropdown-bg: rgba(247, 245, 240, 0.98);
     --shadow: 0 10px 30px rgba(27, 51, 34, 0.1);
