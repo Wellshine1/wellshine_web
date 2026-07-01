@@ -61,10 +61,19 @@ function renderCatalog(searchQuery = "") {
     grid.innerHTML = filteredItems.map(item => {
         const hasDiscount = item.discount_percent > 0;
         const finalPrice = hasDiscount ? Math.round(item.price * (1 - item.discount_percent / 100)) : item.price;
+        const triggerQty = parseInt(item.discount_trigger_qty) || 1;
+        let ribbonHTML = '';
+        if (hasDiscount) {
+            if (triggerQty > 1) {
+                ribbonHTML = `<div class="discount-ribbon">Buy ${triggerQty}+: ${item.discount_percent}% OFF</div>`;
+            } else {
+                ribbonHTML = `<div class="discount-ribbon">${item.discount_percent}% OFF</div>`;
+            }
+        }
         return `
             <div class="item-card-pro" onclick="openQuickView(${item.id})">
                 <div class="product-image-container">
-                    ${hasDiscount ? `<div class="discount-ribbon">${item.discount_percent}% OFF</div>` : ''}
+                    ${ribbonHTML}
                     <img src="${item.img}" class="main-prod-img" onerror="this.src='pics/products/croast.jpg'">
                     <div class="product-img-overlay"><i class="fas fa-search-plus"></i> View Details</div>
                 </div>
@@ -138,12 +147,21 @@ window.openQuickView = function(id) {
 
     const hasDiscount = item.discount_percent > 0;
     const finalPrice = hasDiscount ? Math.round(item.price * (1 - item.discount_percent / 100)) : item.price;
+    const triggerQty = parseInt(item.discount_trigger_qty) || 1;
+    let ribbonHTML = '';
+    if (hasDiscount) {
+        if (triggerQty > 1) {
+            ribbonHTML = `<div class="discount-ribbon" style="top: 15px; left: 15px;">Buy ${triggerQty}+: ${item.discount_percent}% OFF</div>`;
+        } else {
+            ribbonHTML = `<div class="discount-ribbon" style="top: 15px; left: 15px;">${item.discount_percent}% OFF</div>`;
+        }
+    }
     modal.innerHTML = `
         <div class="qv-modal-card">
             <button class="close-qv-btn" onclick="closeQuickView()"><i class="fas fa-times"></i></button>
             <div class="qv-grid">
                 <div class="qv-image-side" style="position: relative;">
-                    ${hasDiscount ? `<div class="discount-ribbon" style="top: 15px; left: 15px;">${item.discount_percent}% OFF</div>` : ''}
+                    ${ribbonHTML}
                     <img src="${item.img}" onerror="this.src='pics/products/croast.jpg'">
                 </div>
                 <div class="qv-details-side">
@@ -162,6 +180,7 @@ window.openQuickView = function(id) {
                         
                         <div class="qv-meta-box">
                             <p><strong>Category:</strong> ${item.cat}</p>
+                            ${hasDiscount && triggerQty > 1 ? `<p style="color:#ff1744; font-weight:700; font-size:0.85rem; margin: 8px 0;"><i class="fas fa-percentage"></i> Bulk Offer: Buy ${triggerQty} or more to unlock ${item.discount_percent}% discount!</p>` : ''}
                             ${stockHTML}
                         </div>
                         

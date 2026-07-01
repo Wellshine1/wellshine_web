@@ -240,8 +240,10 @@ function renderInventoryTable(items) {
                 <td>
                     ${item.discount_percent > 0 ? `
                         <div style="font-size:0.8rem; text-decoration: line-through; opacity: 0.6;">₹${item.price}</div>
-                        <div style="font-weight:600; color: #2ecc71;">₹${Math.round(item.price * (1 - item.discount_percent / 100))} / ${item.unit}</div>
-                        <span style="font-size:0.75rem; background:rgba(46, 204, 113, 0.15); color:#2ecc71; padding:1px 6px; border-radius:10px; font-weight:700;">${item.discount_percent}% OFF</span>
+                        <div style="font-weight:600; color: #ff1744;">₹${Math.round(item.price * (1 - item.discount_percent / 100))} / ${item.unit}</div>
+                        <span style="font-size:0.75rem; background:rgba(255, 23, 68, 0.15); color:#ff1744; padding:1px 6px; border-radius:10px; font-weight:700;">
+                            ${item.discount_percent}% OFF ${item.discount_trigger_qty > 1 ? `(Min: ${item.discount_trigger_qty})` : ''}
+                        </span>
                     ` : `
                         <div style="font-weight:600;">₹${item.price} / ${item.unit}</div>
                     `}
@@ -278,6 +280,7 @@ window.openEditModal = function(id) {
     document.getElementById('edit-product-category').value = item.cat;
     document.getElementById('edit-product-price').value = item.price;
     document.getElementById('edit-product-discount').value = item.discount_percent || 0;
+    document.getElementById('edit-product-discount-trigger').value = item.discount_trigger_qty || 1;
     document.getElementById('edit-product-unit').value = item.unit;
     document.getElementById('edit-product-tag').value = item.tag;
     document.getElementById('edit-product-img').value = item.img;
@@ -308,6 +311,7 @@ window.saveProductDetails = async function(event) {
     const cat = document.getElementById('edit-product-category').value;
     const price = parseInt(document.getElementById('edit-product-price').value);
     const discount_percent = parseInt(document.getElementById('edit-product-discount').value) || 0;
+    const discount_trigger_qty = parseInt(document.getElementById('edit-product-discount-trigger').value) || 1;
     const unit = document.getElementById('edit-product-unit').value.trim();
     const tag = document.getElementById('edit-product-tag').value.trim();
     const img = document.getElementById('edit-product-img').value.trim();
@@ -326,6 +330,7 @@ window.saveProductDetails = async function(event) {
                 cat,
                 price,
                 discount_percent,
+                discount_trigger_qty,
                 unit,
                 tag,
                 img,
@@ -342,6 +347,7 @@ window.saveProductDetails = async function(event) {
                 originalItem.cat = cat;
                 originalItem.price = price;
                 originalItem.discount_percent = discount_percent;
+                originalItem.discount_trigger_qty = discount_trigger_qty;
                 originalItem.unit = unit;
                 originalItem.tag = tag;
                 originalItem.img = img;
@@ -1063,6 +1069,7 @@ window.openAddModal = function() {
     document.getElementById('add-product-category').value = 'Cashew';
     document.getElementById('add-product-price').value = '';
     document.getElementById('add-product-discount').value = '0';
+    document.getElementById('add-product-discount-trigger').value = '1';
     document.getElementById('add-product-unit').value = '';
     document.getElementById('add-product-stock').value = '50';
     document.getElementById('add-product-tag').value = 'Premium Quality';
@@ -1090,6 +1097,7 @@ window.saveNewProduct = async function(event) {
     const cat = document.getElementById('add-product-category').value;
     const price = parseInt(document.getElementById('add-product-price').value);
     const discount_percent = parseInt(document.getElementById('add-product-discount').value) || 0;
+    const discount_trigger_qty = parseInt(document.getElementById('add-product-discount-trigger').value) || 1;
     const unit = document.getElementById('add-product-unit').value.trim();
     const stock = parseInt(document.getElementById('add-product-stock').value) || 0;
     const tag = document.getElementById('add-product-tag').value.trim();
@@ -1108,6 +1116,7 @@ window.saveNewProduct = async function(event) {
                 cat,
                 price,
                 discount_percent,
+                discount_trigger_qty,
                 unit,
                 stock,
                 tag,

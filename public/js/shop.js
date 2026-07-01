@@ -109,11 +109,20 @@ function renderShop(searchQuery = "") {
 
         const hasDiscount = item.discount_percent > 0;
         const finalPrice = hasDiscount ? Math.round(item.price * (1 - item.discount_percent / 100)) : item.price;
+        const triggerQty = parseInt(item.discount_trigger_qty) || 1;
+        let ribbonHTML = '';
+        if (hasDiscount) {
+            if (triggerQty > 1) {
+                ribbonHTML = `<div class="discount-ribbon">Buy ${triggerQty}+: ${item.discount_percent}% OFF</div>`;
+            } else {
+                ribbonHTML = `<div class="discount-ribbon">${item.discount_percent}% OFF</div>`;
+            }
+        }
 
         return `
             <div class="item-card-pro" style="${isOutOfStock ? 'opacity: 0.7;' : ''}">
                 <div class="product-image-container">
-                    ${hasDiscount ? `<div class="discount-ribbon">${item.discount_percent}% OFF</div>` : ''}
+                    ${ribbonHTML}
                     <img src="${item.img}" class="main-prod-img" onerror="this.src='pics/products/croast.jpg'" onclick="openQuickView(${item.id})">
                     <div class="product-img-overlay" onclick="openQuickView(${item.id})"><i class="fas fa-search-plus"></i> Quick View</div>
                 </div>
@@ -126,6 +135,7 @@ function renderShop(searchQuery = "") {
                     ${hasDiscount ? `
                         <span class="price-original-slashed">₹${item.price}</span>
                         <span class="price-discounted">₹${finalPrice}</span>
+                        ${triggerQty > 1 ? `<span style="font-size:0.65rem; color:#ff1744; display:block; margin-top:2px;">(Min Qty: ${triggerQty})</span>` : ''}
                     ` : `
                         ₹${item.price}
                     `}
@@ -283,12 +293,20 @@ function renderCart() {
         const item = inventory.find(p => p.id === cartItem.id);
         if (!item) return '';
         
-        const hasDiscount = item.discount_percent > 0;
-        const finalPrice = hasDiscount ? Math.round(item.price * (1 - item.discount_percent / 100)) : item.price;
+        const triggerQty = parseInt(item.discount_trigger_qty) || 1;
+        const hasDiscountRule = item.discount_percent > 0;
+        const isDiscountUnlocked = hasDiscountRule && cartItem.quantity >= triggerQty;
+        const finalPrice = isDiscountUnlocked ? Math.round(item.price * (1 - item.discount_percent / 100)) : item.price;
         const itemTotal = finalPrice * cartItem.quantity;
         
-        if (hasDiscount) {
+        if (isDiscountUnlocked) {
             totalSavings += (item.price - finalPrice) * cartItem.quantity;
+        }
+
+        let nudgeHTML = '';
+        if (hasDiscountRule && !isDiscountUnlocked) {
+            const diff = triggerQty - cartItem.quantity;
+            nudgeHTML = `<div style="font-size: 0.72rem; color: #ff1744; font-weight: 700; margin-top: 4px;"><i class="fas fa-fire"></i> Add ${diff} more to unlock ${item.discount_percent}% OFF!</div>`;
         }
 
         return `
@@ -296,7 +314,7 @@ function renderCart() {
                 <div class="cart-item-info">
                     <p class="cart-item-title">${item.name}</p>
                     <p class="cart-item-meta">
-                        ${hasDiscount ? `
+                        ${isDiscountUnlocked ? `
                             <span style="text-decoration: line-through; opacity: 0.5; margin-right: 5px;">₹${item.price}</span>
                             <span style="color:#ff1744; font-weight:600;">₹${finalPrice}</span>
                         ` : `
@@ -304,6 +322,7 @@ function renderCart() {
                         `}
                         / ${item.unit}
                     </p>
+                    ${nudgeHTML}
                 </div>
                 <div class="cart-item-controls">
                     <button type="button" onclick="updateQuantity(${item.id}, -1)" class="qty-btn"><i class="fas fa-minus"></i></button>
@@ -321,7 +340,10 @@ function renderCart() {
     const grandTotal = cart.reduce((sum, cartItem) => {
         const item = inventory.find(p => p.id === cartItem.id);
         if (!item) return sum;
-        const finalPrice = item.discount_percent > 0 ? Math.round(item.price * (1 - item.discount_percent / 100)) : item.price;
+        const triggerQty = parseInt(item.discount_trigger_qty) || 1;
+        const finalPrice = (item.discount_percent > 0 && cartItem.quantity >= triggerQty) 
+            ? Math.round(item.price * (1 - item.discount_percent / 100)) 
+            : item.price;
         return sum + (finalPrice * cartItem.quantity);
     }, 0);
 
@@ -372,6 +394,15 @@ window.openQuickView = function(id) {
 
     const hasDiscount = item.discount_percent > 0;
     const finalPrice = hasDiscount ? Math.round(item.price * (1 - item.discount_percent / 100)) : item.price;
+    const triggerQty = parseInt(item.discount_trigger_qty) || 1;
+    let ribbonHTML = '';
+    if (hasDiscount) {
+        if (triggerQty > 1) {
+            ribbonHTML = `<div class="discount-ribbon" style="top: 15px; left: 15px;">Buy ${triggerQty}+: ${item.discount_percent}% OFF</div>`;
+        } else {
+            ribbonHTML = `<div class="discount-ribbon" style="top: 15px; left: 15px;">${item.discount_percent}% OFF</div>`;
+        }
+    }
 
     // Build Quick-View DOM content
     modal.innerHTML = `
@@ -379,7 +410,7 @@ window.openQuickView = function(id) {
             <button class="close-qv-btn" onclick="closeQuickView()"><i class="fas fa-times"></i></button>
             <div class="qv-grid">
                 <div class="qv-image-side" style="position: relative;">
-                    ${hasDiscount ? `<div class="discount-ribbon" style="top: 15px; left: 15px;">${item.discount_percent}% OFF</div>` : ''}
+                    ${ribbonHTML}
                     <img src="${item.img}" onerror="this.src='pics/products/croast.jpg'">
                 </div>
                 <div class="qv-details-side">
@@ -397,6 +428,7 @@ window.openQuickView = function(id) {
                     
                     <div class="qv-meta-box">
                         <p><strong>Category:</strong> ${item.cat}</p>
+                        ${hasDiscount && triggerQty > 1 ? `<p style="color:#ff1744; font-weight:700; font-size:0.85rem; margin: 8px 0;"><i class="fas fa-percentage"></i> Bulk Offer: Buy ${triggerQty} or more to unlock ${item.discount_percent}% discount!</p>` : ''}
                         ${stockHTML}
                     </div>
                     
@@ -517,7 +549,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 const item = inventory.find(p => p.id === cartItem.id);
                 let itemPrice = 0;
                 if (item) {
-                    itemPrice = item.discount_percent > 0 ? Math.round(item.price * (1 - item.discount_percent / 100)) : item.price;
+                    const triggerQty = parseInt(item.discount_trigger_qty) || 1;
+                    itemPrice = (item.discount_percent > 0 && cartItem.quantity >= triggerQty) 
+                        ? Math.round(item.price * (1 - item.discount_percent / 100)) 
+                        : item.price;
                 }
                 const subtotal = item ? itemPrice * cartItem.quantity : 0;
                 grandTotal += subtotal;

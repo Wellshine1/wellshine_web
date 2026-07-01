@@ -161,7 +161,8 @@ async function setupTables() {
             img VARCHAR(255) NOT NULL,
             description TEXT,
             stock INT DEFAULT 0,
-            discount_percent INT DEFAULT 0
+            discount_percent INT DEFAULT 0,
+            discount_trigger_qty INT DEFAULT 1
         )
     `);
 
@@ -185,6 +186,18 @@ async function setupTables() {
             await query('ALTER TABLE products ADD COLUMN discount_percent INT DEFAULT 0');
         }
         console.log("Verified: 'discount_percent' column is present.");
+    } catch (err) {
+        // Safe to ignore if column already exists in other DB setups
+    }
+
+    // Ensure discount_trigger_qty column exists if table was created previously without it
+    try {
+        if (dbType === 'postgres' || dbType === 'postgresql') {
+            await query('ALTER TABLE products ADD COLUMN IF NOT EXISTS discount_trigger_qty INT DEFAULT 1');
+        } else {
+            await query('ALTER TABLE products ADD COLUMN discount_trigger_qty INT DEFAULT 1');
+        }
+        console.log("Verified: 'discount_trigger_qty' column is present.");
     } catch (err) {
         // Safe to ignore if column already exists in other DB setups
     }
@@ -842,7 +855,7 @@ app.post('/api/admin/orders/confirm', requireAdmin, async (req, res) => {
 
 // ADD NEW PRODUCT
 app.post('/api/admin/products/add', requireAdmin, async (req, res) => {
-    const { name, price, unit, tag, cat, img, description, stock, discount_percent } = req.body;
+    const { name, price, unit, tag, cat, img, description, stock, discount_percent, discount_trigger_qty } = req.body;
     if (!name || price === undefined || !unit || !cat) {
         return res.status(400).json({ error: 'Missing required product parameters (name, price, unit, cat)' });
     }
@@ -851,7 +864,7 @@ app.post('/api/admin/products/add', requireAdmin, async (req, res) => {
         const nextId = (maxIdResult.length > 0 && maxIdResult[0].max_id !== null) ? parseInt(maxIdResult[0].max_id) + 1 : 1;
 
         await query(
-            'INSERT INTO products (id, name, price, unit, tag, cat, img, description, stock, discount_percent) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
+            'INSERT INTO products (id, name, price, unit, tag, cat, img, description, stock, discount_percent, discount_trigger_qty) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
             [
                 nextId,
                 name,
@@ -862,7 +875,8 @@ app.post('/api/admin/products/add', requireAdmin, async (req, res) => {
                 img || 'pics/products/croast.jpg',
                 description || '',
                 parseInt(stock) || 0,
-                parseInt(discount_percent) || 0
+                parseInt(discount_percent) || 0,
+                parseInt(discount_trigger_qty) || 1
             ]
         );
         res.json({ success: true, message: 'Product added successfully', productId: nextId });
@@ -872,9 +886,9 @@ app.post('/api/admin/products/add', requireAdmin, async (req, res) => {
     }
 });
 
-// UPDATE PRODUCT DETAILS (Name, price, category, unit, tag, img, description, discount_percent)
+// UPDATE PRODUCT DETAILS (Name, price, category, unit, tag, img, description, discount_percent, discount_trigger_qty)
 app.post('/api/admin/products/update', requireAdmin, async (req, res) => {
-    const { productId, name, price, unit, tag, cat, img, description, stock, discount_percent } = req.body;
+    const { productId, name, price, unit, tag, cat, img, description, stock, discount_percent, discount_trigger_qty } = req.body;
     if (productId === undefined) {
         return res.status(400).json({ error: 'Missing productId' });
     }
@@ -892,6 +906,7 @@ app.post('/api/admin/products/update', requireAdmin, async (req, res) => {
         if (description !== undefined) { fields.push('description = ?'); params.push(description); }
         if (stock !== undefined) { fields.push('stock = ?'); params.push(parseInt(stock)); }
         if (discount_percent !== undefined) { fields.push('discount_percent = ?'); params.push(parseInt(discount_percent)); }
+        if (discount_trigger_qty !== undefined) { fields.push('discount_trigger_qty = ?'); params.push(parseInt(discount_trigger_qty)); }
 
         if (fields.length === 0) {
             return res.status(400).json({ error: 'No fields to update' });
