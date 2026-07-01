@@ -62,6 +62,7 @@ function renderCatalog(searchQuery = "") {
         const hasDiscount = item.discount_percent > 0;
         const finalPrice = hasDiscount ? Math.round(item.price * (1 - item.discount_percent / 100)) : item.price;
         const triggerQty = parseInt(item.discount_trigger_qty) || 1;
+        const isFlatDiscount = hasDiscount && triggerQty === 1;
         let ribbonHTML = '';
         if (hasDiscount) {
             if (triggerQty > 1) {
@@ -80,7 +81,7 @@ function renderCatalog(searchQuery = "") {
                 <span class="tag-label">${item.tag}</span>
                 <h3 class="prod-title">${item.name}</h3>
                 <p class="price-text">
-                    ${hasDiscount ? `
+                    ${isFlatDiscount ? `
                         <span class="price-original-slashed">₹${item.price}</span>
                         <span class="price-discounted">₹${finalPrice}</span>
                     ` : `
@@ -169,7 +170,7 @@ window.openQuickView = function(id) {
                         <span class="tag-label" style="font-size: 0.75rem;">${item.tag}</span>
                         <h2 class="qv-title">${item.name}</h2>
                         <p class="qv-price">
-                            ${hasDiscount ? `
+                            ${(hasDiscount && triggerQty === 1) ? `
                                 <span class="price-original-slashed" style="font-size: 1.1rem; margin-right: 8px;">₹${item.price}</span>
                                 <span class="price-discounted" style="font-size: 1.7rem; color: #ff1744; font-weight: 700;">₹${finalPrice}</span>
                             ` : `

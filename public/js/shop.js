@@ -108,8 +108,10 @@ function renderShop(searchQuery = "") {
         }
 
         const hasDiscount = item.discount_percent > 0;
-        const finalPrice = hasDiscount ? Math.round(item.price * (1 - item.discount_percent / 100)) : item.price;
         const triggerQty = parseInt(item.discount_trigger_qty) || 1;
+        const quantity = cartItem ? cartItem.quantity : 0;
+        const isDiscountUnlocked = hasDiscount && quantity >= triggerQty;
+        const finalPrice = isDiscountUnlocked ? Math.round(item.price * (1 - item.discount_percent / 100)) : item.price;
         let ribbonHTML = '';
         if (hasDiscount) {
             if (triggerQty > 1) {
@@ -132,14 +134,17 @@ function renderShop(searchQuery = "") {
                     <h3 class="prod-title">${item.name}</h3>
                 </div>
                 <p class="price-text">
-                    ${hasDiscount ? `
+                    ${isDiscountUnlocked ? `
                         <span class="price-original-slashed">₹${item.price}</span>
                         <span class="price-discounted">₹${finalPrice}</span>
-                        ${triggerQty > 1 ? `<span style="font-size:0.65rem; color:#ff1744; display:block; margin-top:2px;">(Min Qty: ${triggerQty})</span>` : ''}
+                    ` : (hasDiscount && triggerQty === 1) ? `
+                        <span class="price-original-slashed">₹${item.price}</span>
+                        <span class="price-discounted">₹${Math.round(item.price * (1 - item.discount_percent / 100))}</span>
                     ` : `
                         ₹${item.price}
                     `}
                     <span class="unit-label">/ ${item.unit}</span>
+                    ${(hasDiscount && triggerQty > 1 && !isDiscountUnlocked) ? `<span style="font-size:0.65rem; color:#ff1744; display:block; margin-top:2px;">(Buy ${triggerQty}+ to get ${item.discount_percent}% OFF)</span>` : ''}
                 </p>
                 <div class="card-action-container">${controlHTML}</div>
             </div>
