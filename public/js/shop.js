@@ -298,7 +298,7 @@ function renderCart() {
                     <p class="cart-item-meta">
                         ${hasDiscount ? `
                             <span style="text-decoration: line-through; opacity: 0.5; margin-right: 5px;">₹${item.price}</span>
-                            <span style="color:#2ecc71; font-weight:600;">₹${finalPrice}</span>
+                            <span style="color:#ff1744; font-weight:600;">₹${finalPrice}</span>
                         ` : `
                             ₹${item.price}
                         `}
@@ -388,7 +388,7 @@ window.openQuickView = function(id) {
                     <p class="qv-price">
                         ${hasDiscount ? `
                             <span class="price-original-slashed" style="font-size: 1.1rem; margin-right: 8px;">₹${item.price}</span>
-                            <span class="price-discounted" style="font-size: 1.7rem; color: #2ecc71; font-weight: 700;">₹${finalPrice}</span>
+                            <span class="price-discounted" style="font-size: 1.7rem; color: #ff1744; font-weight: 700;">₹${finalPrice}</span>
                         ` : `
                             ₹${item.price}
                         `}

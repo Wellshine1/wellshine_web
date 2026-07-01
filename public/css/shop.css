@@ -1069,13 +1069,13 @@ body {
     position: absolute;
     top: 12px;
     left: 12px;
-    background: linear-gradient(135deg, #2e7d32, #2ecc71);
+    background: linear-gradient(135deg, #d32f2f, #ff1744);
     color: white;
     font-size: 0.7rem;
     font-weight: 800;
     padding: 4px 10px;
     border-radius: 6px;
-    box-shadow: 0 4px 10px rgba(46, 204, 113, 0.4);
+    box-shadow: 0 4px 10px rgba(255, 23, 68, 0.4);
     z-index: 5;
     text-transform: uppercase;
     letter-spacing: 0.5px;
@@ -1096,6 +1096,6 @@ body {
 }
 
 .price-discounted {
-    color: #2ecc71;
+    color: #ff1744;
     font-weight: 700;
 }
