@@ -838,3 +838,40 @@ body {
     transform: scale(1.1);
 }
 
+/* --- PRODUCT DISCOUNTS --- */
+.discount-ribbon {
+    position: absolute;
+    top: 12px;
+    left: 12px;
+    background: linear-gradient(135deg, #2e7d32, #2ecc71);
+    color: white;
+    font-size: 0.7rem;
+    font-weight: 800;
+    padding: 4px 10px;
+    border-radius: 6px;
+    box-shadow: 0 4px 10px rgba(46, 204, 113, 0.4);
+    z-index: 5;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    animation: pulseBadge 2s infinite alternate;
+}
+
+@keyframes pulseBadge {
+    0% { transform: scale(1); }
+    100% { transform: scale(1.05); }
+}
+
+.price-original-slashed {
+    text-decoration: line-through;
+    opacity: 0.5;
+    margin-right: 8px;
+    font-size: 0.9rem;
+    font-weight: 500;
+}
+
+.price-discounted {
+    color: #2ecc71;
+    font-weight: 700;
+}
+
+

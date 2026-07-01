@@ -149,7 +149,7 @@ async function query(sql, params = []) {
 async function setupTables() {
     console.log('Verifying table schemas...');
     
-    // Create Products Table with stock column if not exists (Removed 'origin' column)
+    // Create Products Table with stock and discount columns if not exists (Removed 'origin' column)
     await query(`
         CREATE TABLE IF NOT EXISTS products (
             id INT PRIMARY KEY,
@@ -160,7 +160,8 @@ async function setupTables() {
             cat VARCHAR(100) NOT NULL,
             img VARCHAR(255) NOT NULL,
             description TEXT,
-            stock INT DEFAULT 0
+            stock INT DEFAULT 0,
+            discount_percent INT DEFAULT 0
         )
     `);
 
@@ -172,6 +173,18 @@ async function setupTables() {
             await query('ALTER TABLE products ADD COLUMN stock INT DEFAULT 0');
         }
         console.log("Verified: 'stock' column is present.");
+    } catch (err) {
+        // Safe to ignore if column already exists in other DB setups
+    }
+
+    // Ensure discount_percent column exists if table was created previously without it
+    try {
+        if (dbType === 'postgres' || dbType === 'postgresql') {
+            await query('ALTER TABLE products ADD COLUMN IF NOT EXISTS discount_percent INT DEFAULT 0');
+        } else {
+            await query('ALTER TABLE products ADD COLUMN discount_percent INT DEFAULT 0');
+        }
+        console.log("Verified: 'discount_percent' column is present.");
     } catch (err) {
         // Safe to ignore if column already exists in other DB setups
     }
@@ -827,9 +840,9 @@ app.post('/api/admin/orders/confirm', requireAdmin, async (req, res) => {
     }
 });
 
-// UPDATE PRODUCT DETAILS (Name, price, category, unit, tag, img, description)
+// UPDATE PRODUCT DETAILS (Name, price, category, unit, tag, img, description, discount_percent)
 app.post('/api/admin/products/update', requireAdmin, async (req, res) => {
-    const { productId, name, price, unit, tag, cat, img, description, stock } = req.body;
+    const { productId, name, price, unit, tag, cat, img, description, stock, discount_percent } = req.body;
     if (productId === undefined) {
         return res.status(400).json({ error: 'Missing productId' });
     }
@@ -846,6 +859,7 @@ app.post('/api/admin/products/update', requireAdmin, async (req, res) => {
         if (img !== undefined) { fields.push('img = ?'); params.push(img); }
         if (description !== undefined) { fields.push('description = ?'); params.push(description); }
         if (stock !== undefined) { fields.push('stock = ?'); params.push(parseInt(stock)); }
+        if (discount_percent !== undefined) { fields.push('discount_percent = ?'); params.push(parseInt(discount_percent)); }
 
         if (fields.length === 0) {
             return res.status(400).json({ error: 'No fields to update' });

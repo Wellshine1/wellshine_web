@@ -305,8 +305,12 @@
                     
                     <div class="form-row">
                         <div class="form-group">
-                            <label for="edit-product-price">Price (₹)</label>
+                            <label for="edit-product-price">Original Price (₹)</label>
                             <input type="number" id="edit-product-price" min="0" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="edit-product-discount">Discount (%)</label>
+                            <input type="number" id="edit-product-discount" min="0" max="99" value="0" required>
                         </div>
                         <div class="form-group">
                             <label for="edit-product-unit">Unit (e.g., kg, 500g)</label>
@@ -327,6 +331,10 @@
                     <div class="form-group">
                         <label for="edit-product-desc">Description / Specifications</label>
                         <textarea id="edit-product-desc" rows="3"></textarea>
+                    </div>
+
+                    <div class="form-group" style="margin-top: 15px; padding: 10px; background: rgba(46, 204, 113, 0.1); border: 1px dashed #2ecc71; border-radius: 8px; text-align: center;">
+                        <span style="font-size: 0.9rem; font-weight: 700; color: #2ecc71;">Calculated Discounted Price: ₹<span id="edit-product-preview-price">0</span></span>
                     </div>
                 </div>
                 

@@ -57,6 +57,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Set up Drag and Drop for CSV file
     initCSVDragDrop();
+
+    // Live update preview price in modal
+    const priceInput = document.getElementById('edit-product-price');
+    const discountInput = document.getElementById('edit-product-discount');
+    if (priceInput && discountInput) {
+        priceInput.addEventListener('input', window.updatePreviewPrice);
+        discountInput.addEventListener('input', window.updatePreviewPrice);
+    }
 });
 
 // Theme Toggle Coordinator
@@ -221,7 +229,15 @@ function renderInventoryTable(items) {
                     </div>
                 </td>
                 <td><span style="font-weight:600;">${item.cat}</span></td>
-                <td>₹${item.price} / ${item.unit}</td>
+                <td>
+                    ${item.discount_percent > 0 ? `
+                        <div style="font-size:0.8rem; text-decoration: line-through; opacity: 0.6;">₹${item.price}</div>
+                        <div style="font-weight:600; color: #2ecc71;">₹${Math.round(item.price * (1 - item.discount_percent / 100))} / ${item.unit}</div>
+                        <span style="font-size:0.75rem; background:rgba(46, 204, 113, 0.15); color:#2ecc71; padding:1px 6px; border-radius:10px; font-weight:700;">${item.discount_percent}% OFF</span>
+                    ` : `
+                        <div style="font-weight:600;">₹${item.price} / ${item.unit}</div>
+                    `}
+                </td>
                 <td>
                     <div class="stock-edit-wrap">
                         <button class="stock-btn-adjust" onclick="adjustStockInput(${item.id}, -1)"><i class="fas fa-minus"></i></button>
@@ -253,16 +269,27 @@ window.openEditModal = function(id) {
     document.getElementById('edit-product-name').value = item.name;
     document.getElementById('edit-product-category').value = item.cat;
     document.getElementById('edit-product-price').value = item.price;
+    document.getElementById('edit-product-discount').value = item.discount_percent || 0;
     document.getElementById('edit-product-unit').value = item.unit;
     document.getElementById('edit-product-tag').value = item.tag;
     document.getElementById('edit-product-img').value = item.img;
     document.getElementById('edit-product-desc').value = item.description || '';
+    
+    // Live update preview price
+    updatePreviewPrice();
     
     document.getElementById('edit-modal').style.display = 'flex';
 };
 
 window.closeEditModal = function() {
     document.getElementById('edit-modal').style.display = 'none';
+};
+
+window.updatePreviewPrice = function() {
+    const price = parseInt(document.getElementById('edit-product-price').value) || 0;
+    const discount = parseInt(document.getElementById('edit-product-discount').value) || 0;
+    const finalPrice = discount > 0 ? Math.round(price * (1 - discount / 100)) : price;
+    document.getElementById('edit-product-preview-price').innerText = finalPrice;
 };
 
 window.saveProductDetails = async function(event) {
@@ -272,6 +299,7 @@ window.saveProductDetails = async function(event) {
     const name = document.getElementById('edit-product-name').value.trim();
     const cat = document.getElementById('edit-product-category').value;
     const price = parseInt(document.getElementById('edit-product-price').value);
+    const discount_percent = parseInt(document.getElementById('edit-product-discount').value) || 0;
     const unit = document.getElementById('edit-product-unit').value.trim();
     const tag = document.getElementById('edit-product-tag').value.trim();
     const img = document.getElementById('edit-product-img').value.trim();
@@ -289,6 +317,7 @@ window.saveProductDetails = async function(event) {
                 name,
                 cat,
                 price,
+                discount_percent,
                 unit,
                 tag,
                 img,
@@ -304,6 +333,7 @@ window.saveProductDetails = async function(event) {
                 originalItem.name = name;
                 originalItem.cat = cat;
                 originalItem.price = price;
+                originalItem.discount_percent = discount_percent;
                 originalItem.unit = unit;
                 originalItem.tag = tag;
                 originalItem.img = img;

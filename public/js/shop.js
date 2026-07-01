@@ -46,7 +46,8 @@ function updateCategoryBadges() {
         'Dry Fruits': inventory.filter(item => item.cat === 'Dry Fruits').length,
         'Oats & Millets': inventory.filter(item => item.cat === 'Oats & Millets').length,
         'Snacks & Breakfast': inventory.filter(item => item.cat === 'Snacks & Breakfast').length,
-        Spices: inventory.filter(item => item.cat === 'Spices').length
+        Spices: inventory.filter(item => item.cat === 'Spices').length,
+        offers: inventory.filter(item => item.discount_percent > 0).length
     };
 
     for (const [key, val] of Object.entries(counts)) {
@@ -61,7 +62,8 @@ function renderShop(searchQuery = "") {
     if (!grid) return;
 
     const filteredItems = inventory.filter(item => {
-        const matchesCategory = (currentFilter === 'all' || item.cat === currentFilter);
+        const matchesCategory = (currentFilter === 'all' || 
+                                 (currentFilter === 'offers' ? item.discount_percent > 0 : item.cat === currentFilter));
         const matchesSearch = item.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
                               item.tag.toLowerCase().includes(searchQuery.toLowerCase());
         return matchesCategory && matchesSearch;
@@ -105,18 +107,30 @@ function renderShop(searchQuery = "") {
             controlHTML = `<button type="button" class="add-btn-primary" onclick="addToCart(${item.id})">Add to Order +</button>`;
         }
 
+        const hasDiscount = item.discount_percent > 0;
+        const finalPrice = hasDiscount ? Math.round(item.price * (1 - item.discount_percent / 100)) : item.price;
+
         return `
             <div class="item-card-pro" style="${isOutOfStock ? 'opacity: 0.7;' : ''}">
-                <div class="product-image-container" onclick="openQuickView(${item.id})">
-                    <img src="${item.img}" class="main-prod-img" onerror="this.src='pics/products/croast.jpg'">
-                    <div class="product-img-overlay"><i class="fas fa-search-plus"></i> Quick View</div>
+                <div class="product-image-container">
+                    ${hasDiscount ? `<div class="discount-ribbon">${item.discount_percent}% OFF</div>` : ''}
+                    <img src="${item.img}" class="main-prod-img" onerror="this.src='pics/products/croast.jpg'" onclick="openQuickView(${item.id})">
+                    <div class="product-img-overlay" onclick="openQuickView(${item.id})"><i class="fas fa-search-plus"></i> Quick View</div>
                 </div>
                 <div onclick="openQuickView(${item.id})" style="cursor: pointer;">
                     <div style="text-align: center;">${stockLabelHTML}</div>
                     <span class="tag-label">${item.tag}</span>
                     <h3 class="prod-title">${item.name}</h3>
                 </div>
-                <p class="price-text">₹${item.price} <span class="unit-label">/ ${item.unit}</span></p>
+                <p class="price-text">
+                    ${hasDiscount ? `
+                        <span class="price-original-slashed">₹${item.price}</span>
+                        <span class="price-discounted">₹${finalPrice}</span>
+                    ` : `
+                        ₹${item.price}
+                    `}
+                    <span class="unit-label">/ ${item.unit}</span>
+                </p>
                 <div class="card-action-container">${controlHTML}</div>
             </div>
         `;
@@ -257,18 +271,39 @@ function renderCart() {
             </div>`;
         const totalContainer = document.getElementById('cart-total-value');
         if (totalContainer) totalContainer.innerText = "₹0";
+        // Clear savings notice
+        const savingsEl = document.getElementById('cart-savings-notice');
+        if (savingsEl) savingsEl.style.display = 'none';
         return;
     }
+
+    let totalSavings = 0;
 
     list.innerHTML = cart.map(cartItem => {
         const item = inventory.find(p => p.id === cartItem.id);
         if (!item) return '';
-        const itemTotal = item.price * cartItem.quantity;
+        
+        const hasDiscount = item.discount_percent > 0;
+        const finalPrice = hasDiscount ? Math.round(item.price * (1 - item.discount_percent / 100)) : item.price;
+        const itemTotal = finalPrice * cartItem.quantity;
+        
+        if (hasDiscount) {
+            totalSavings += (item.price - finalPrice) * cartItem.quantity;
+        }
+
         return `
             <div class="cart-item-row">
                 <div class="cart-item-info">
                     <p class="cart-item-title">${item.name}</p>
-                    <p class="cart-item-meta">₹${item.price} / ${item.unit}</p>
+                    <p class="cart-item-meta">
+                        ${hasDiscount ? `
+                            <span style="text-decoration: line-through; opacity: 0.5; margin-right: 5px;">₹${item.price}</span>
+                            <span style="color:#2ecc71; font-weight:600;">₹${finalPrice}</span>
+                        ` : `
+                            ₹${item.price}
+                        `}
+                        / ${item.unit}
+                    </p>
                 </div>
                 <div class="cart-item-controls">
                     <button type="button" onclick="updateQuantity(${item.id}, -1)" class="qty-btn"><i class="fas fa-minus"></i></button>
@@ -285,11 +320,33 @@ function renderCart() {
 
     const grandTotal = cart.reduce((sum, cartItem) => {
         const item = inventory.find(p => p.id === cartItem.id);
-        return sum + (item ? item.price * cartItem.quantity : 0);
+        if (!item) return sum;
+        const finalPrice = item.discount_percent > 0 ? Math.round(item.price * (1 - item.discount_percent / 100)) : item.price;
+        return sum + (finalPrice * cartItem.quantity);
     }, 0);
 
     const totalContainer = document.getElementById('cart-total-value');
     if (totalContainer) totalContainer.innerText = `₹${grandTotal}`;
+
+    // Handle savings notice display in DOM
+    let savingsEl = document.getElementById('cart-savings-notice');
+    if (totalSavings > 0) {
+        if (!savingsEl) {
+            const totalSection = document.querySelector('.sidebar-total-section');
+            if (totalSection) {
+                savingsEl = document.createElement('div');
+                savingsEl.id = 'cart-savings-notice';
+                savingsEl.style.cssText = 'margin: 10px 0; padding: 10px; background: rgba(46, 204, 113, 0.15); border: 1px solid #2ecc71; border-radius: 8px; color: #2ecc71; font-size: 0.85rem; font-weight: 700; display: flex; align-items: center; justify-content: center; gap: 8px;';
+                totalSection.parentNode.insertBefore(savingsEl, totalSection);
+            }
+        }
+        if (savingsEl) {
+            savingsEl.innerHTML = `<i class="fas fa-fire"></i> Wholesale Deal: You save ₹${totalSavings} on this order!`;
+            savingsEl.style.display = 'flex';
+        }
+    } else if (savingsEl) {
+        savingsEl.style.display = 'none';
+    }
 }
 
 // 6. PRODUCT QUICK VIEW MODAL
@@ -313,18 +370,30 @@ window.openQuickView = function(id) {
         stockHTML = `<p><strong>Stock Status:</strong> <span style="color:#2ecc71; font-weight:700;">In Stock (${stock} available)</span></p>`;
     }
 
+    const hasDiscount = item.discount_percent > 0;
+    const finalPrice = hasDiscount ? Math.round(item.price * (1 - item.discount_percent / 100)) : item.price;
+
     // Build Quick-View DOM content
     modal.innerHTML = `
         <div class="qv-modal-card">
             <button class="close-qv-btn" onclick="closeQuickView()"><i class="fas fa-times"></i></button>
             <div class="qv-grid">
-                <div class="qv-image-side">
+                <div class="qv-image-side" style="position: relative;">
+                    ${hasDiscount ? `<div class="discount-ribbon" style="top: 15px; left: 15px;">${item.discount_percent}% OFF</div>` : ''}
                     <img src="${item.img}" onerror="this.src='pics/products/croast.jpg'">
                 </div>
                 <div class="qv-details-side">
                     <span class="tag-label" style="font-size: 0.75rem;">${item.tag}</span>
                     <h2 class="qv-title">${item.name}</h2>
-                    <p class="qv-price">₹${item.price} <span class="unit-label">/ ${item.unit}</span></p>
+                    <p class="qv-price">
+                        ${hasDiscount ? `
+                            <span class="price-original-slashed" style="font-size: 1.1rem; margin-right: 8px;">₹${item.price}</span>
+                            <span class="price-discounted" style="font-size: 1.7rem; color: #2ecc71; font-weight: 700;">₹${finalPrice}</span>
+                        ` : `
+                            ₹${item.price}
+                        `}
+                        <span class="unit-label">/ ${item.unit}</span>
+                    </p>
                     
                     <div class="qv-meta-box">
                         <p><strong>Category:</strong> ${item.cat}</p>
@@ -446,13 +515,17 @@ document.addEventListener('DOMContentLoaded', () => {
             let grandTotal = 0;
             const orderItems = cart.map(cartItem => {
                 const item = inventory.find(p => p.id === cartItem.id);
-                const subtotal = item ? item.price * cartItem.quantity : 0;
+                let itemPrice = 0;
+                if (item) {
+                    itemPrice = item.discount_percent > 0 ? Math.round(item.price * (1 - item.discount_percent / 100)) : item.price;
+                }
+                const subtotal = item ? itemPrice * cartItem.quantity : 0;
                 grandTotal += subtotal;
                 return {
                     id: cartItem.id,
                     name: item ? item.name : 'Unknown Product',
                     quantity: cartItem.quantity,
-                    price: item ? item.price : 0,
+                    price: itemPrice,
                     unit: item ? item.unit : '',
                     subtotal: subtotal
                 };

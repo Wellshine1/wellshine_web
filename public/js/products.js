@@ -31,7 +31,8 @@ function updateCategoryBadges() {
         'Dry Fruits': catalog.filter(item => item.cat === 'Dry Fruits').length,
         'Oats & Millets': catalog.filter(item => item.cat === 'Oats & Millets').length,
         'Snacks & Breakfast': catalog.filter(item => item.cat === 'Snacks & Breakfast').length,
-        Spices: catalog.filter(item => item.cat === 'Spices').length
+        Spices: catalog.filter(item => item.cat === 'Spices').length,
+        offers: catalog.filter(item => item.discount_percent > 0).length
     };
 
     for (const [key, val] of Object.entries(counts)) {
@@ -45,7 +46,8 @@ function renderCatalog(searchQuery = "") {
     if (!grid) return;
 
     const filteredItems = catalog.filter(item => {
-        const matchesCategory = (currentFilter === 'all' || item.cat === currentFilter);
+        const matchesCategory = (currentFilter === 'all' || 
+                                 (currentFilter === 'offers' ? item.discount_percent > 0 : item.cat === currentFilter));
         const matchesSearch = item.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
                               item.tag.toLowerCase().includes(searchQuery.toLowerCase());
         return matchesCategory && matchesSearch;
@@ -56,18 +58,31 @@ function renderCatalog(searchQuery = "") {
         return;
     }
 
-    grid.innerHTML = filteredItems.map(item => `
-        <div class="item-card-pro" onclick="openQuickView(${item.id})">
-            <div class="product-image-container">
-                <img src="${item.img}" class="main-prod-img" onerror="this.src='pics/products/croast.jpg'">
-                <div class="product-img-overlay"><i class="fas fa-search-plus"></i> View Details</div>
+    grid.innerHTML = filteredItems.map(item => {
+        const hasDiscount = item.discount_percent > 0;
+        const finalPrice = hasDiscount ? Math.round(item.price * (1 - item.discount_percent / 100)) : item.price;
+        return `
+            <div class="item-card-pro" onclick="openQuickView(${item.id})">
+                <div class="product-image-container">
+                    ${hasDiscount ? `<div class="discount-ribbon">${item.discount_percent}% OFF</div>` : ''}
+                    <img src="${item.img}" class="main-prod-img" onerror="this.src='pics/products/croast.jpg'">
+                    <div class="product-img-overlay"><i class="fas fa-search-plus"></i> View Details</div>
+                </div>
+                <span class="tag-label">${item.tag}</span>
+                <h3 class="prod-title">${item.name}</h3>
+                <p class="price-text">
+                    ${hasDiscount ? `
+                        <span class="price-original-slashed">₹${item.price}</span>
+                        <span class="price-discounted">₹${finalPrice}</span>
+                    ` : `
+                        ₹${item.price}
+                    `}
+                    <span class="unit-label">/ ${item.unit}</span>
+                </p>
+                <button type="button" class="view-btn-primary">View Specifications</button>
             </div>
-            <span class="tag-label">${item.tag}</span>
-            <h3 class="prod-title">${item.name}</h3>
-            <p class="price-text">₹${item.price} <span class="unit-label">/ ${item.unit}</span></p>
-            <button type="button" class="view-btn-primary">View Specifications</button>
-        </div>
-    `).join('');
+        `;
+    }).join('');
 }
 
 window.filterCatalog = function(cat, element) {
@@ -121,18 +136,29 @@ window.openQuickView = function(id) {
         stockHTML = `<p><strong>Stock Status:</strong> <span style="color:#2ecc71; font-weight:700;">In Stock (${stock} available)</span></p>`;
     }
 
+    const hasDiscount = item.discount_percent > 0;
+    const finalPrice = hasDiscount ? Math.round(item.price * (1 - item.discount_percent / 100)) : item.price;
     modal.innerHTML = `
         <div class="qv-modal-card">
             <button class="close-qv-btn" onclick="closeQuickView()"><i class="fas fa-times"></i></button>
             <div class="qv-grid">
-                <div class="qv-image-side">
+                <div class="qv-image-side" style="position: relative;">
+                    ${hasDiscount ? `<div class="discount-ribbon" style="top: 15px; left: 15px;">${item.discount_percent}% OFF</div>` : ''}
                     <img src="${item.img}" onerror="this.src='pics/products/croast.jpg'">
                 </div>
                 <div class="qv-details-side">
                     <div>
                         <span class="tag-label" style="font-size: 0.75rem;">${item.tag}</span>
                         <h2 class="qv-title">${item.name}</h2>
-                        <p class="qv-price">₹${item.price} <span class="unit-label">/ ${item.unit}</span></p>
+                        <p class="qv-price">
+                            ${hasDiscount ? `
+                                <span class="price-original-slashed" style="font-size: 1.1rem; margin-right: 8px;">₹${item.price}</span>
+                                <span class="price-discounted" style="font-size: 1.7rem; color: #2ecc71; font-weight: 700;">₹${finalPrice}</span>
+                            ` : `
+                                ₹${item.price}
+                            `}
+                            <span class="unit-label">/ ${item.unit}</span>
+                        </p>
                         
                         <div class="qv-meta-box">
                             <p><strong>Category:</strong> ${item.cat}</p>
