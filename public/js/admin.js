@@ -65,6 +65,14 @@ document.addEventListener('DOMContentLoaded', () => {
         priceInput.addEventListener('input', window.updatePreviewPrice);
         discountInput.addEventListener('input', window.updatePreviewPrice);
     }
+
+    // Live update preview price in add modal
+    const addPriceInput = document.getElementById('add-product-price');
+    const addDiscountInput = document.getElementById('add-product-discount');
+    if (addPriceInput && addDiscountInput) {
+        addPriceInput.addEventListener('input', window.updateAddPreviewPrice);
+        addDiscountInput.addEventListener('input', window.updateAddPreviewPrice);
+    }
 });
 
 // Theme Toggle Coordinator
@@ -1047,5 +1055,81 @@ window.executeSync = async function() {
     } finally {
         syncBtn.disabled = false;
         syncBtn.innerHTML = origBtnHTML;
+    }
+};
+
+window.openAddModal = function() {
+    document.getElementById('add-product-name').value = '';
+    document.getElementById('add-product-category').value = 'Cashew';
+    document.getElementById('add-product-price').value = '';
+    document.getElementById('add-product-discount').value = '0';
+    document.getElementById('add-product-unit').value = '';
+    document.getElementById('add-product-stock').value = '50';
+    document.getElementById('add-product-tag').value = 'Premium Quality';
+    document.getElementById('add-product-img').value = 'pics/products/croast.jpg';
+    document.getElementById('add-product-desc').value = '';
+    updateAddPreviewPrice();
+    document.getElementById('add-modal').style.display = 'flex';
+};
+
+window.closeAddModal = function() {
+    document.getElementById('add-modal').style.display = 'none';
+};
+
+window.updateAddPreviewPrice = function() {
+    const price = parseInt(document.getElementById('add-product-price').value) || 0;
+    const discount = parseInt(document.getElementById('add-product-discount').value) || 0;
+    const finalPrice = discount > 0 ? Math.round(price * (1 - discount / 100)) : price;
+    document.getElementById('add-product-preview-price').innerText = finalPrice;
+};
+
+window.saveNewProduct = async function(event) {
+    event.preventDefault();
+    
+    const name = document.getElementById('add-product-name').value.trim();
+    const cat = document.getElementById('add-product-category').value;
+    const price = parseInt(document.getElementById('add-product-price').value);
+    const discount_percent = parseInt(document.getElementById('add-product-discount').value) || 0;
+    const unit = document.getElementById('add-product-unit').value.trim();
+    const stock = parseInt(document.getElementById('add-product-stock').value) || 0;
+    const tag = document.getElementById('add-product-tag').value.trim();
+    const img = document.getElementById('add-product-img').value.trim();
+    const description = document.getElementById('add-product-desc').value.trim();
+    
+    try {
+        const res = await fetch('/api/admin/products/add', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${getAdminPasscode()}`
+            },
+            body: JSON.stringify({
+                name,
+                cat,
+                price,
+                discount_percent,
+                unit,
+                stock,
+                tag,
+                img,
+                description
+            })
+        });
+        
+        if (res.ok) {
+            showToast('New product added successfully!', 'success');
+            closeAddModal();
+            await fetchInventory();
+        } else {
+            let errorMsg = 'Failed to add new product.';
+            try {
+                const data = await res.json();
+                errorMsg = data.error || errorMsg;
+            } catch (e) {}
+            showToast(errorMsg, 'error');
+        }
+    } catch (err) {
+        console.error(err);
+        showToast('Server connection error adding product.', 'error');
     }
 };

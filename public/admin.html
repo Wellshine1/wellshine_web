@@ -90,11 +90,14 @@
             
             <!-- TAB 1: INVENTORY MANAGEMENT -->
             <section id="tab-inventory" class="tab-section active">
-                <div class="viewport-header">
+                <div class="viewport-header" style="display: flex; justify-content: space-between; align-items: center;">
                     <div>
                         <h1>Stock Inventory</h1>
                         <p>Manage product stock levels, view availability, and save updates.</p>
                     </div>
+                    <button class="add-product-btn" onclick="openAddModal()" style="background: var(--gold); color: #000; border: none; padding: 10px 20px; border-radius: 8px; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 8px; font-size: 0.9rem; transition: 0.2s;">
+                        <i class="fas fa-plus"></i> Add New Product
+                    </button>
                 </div>
 
                 <div class="controls-bar glass-card">
@@ -341,6 +344,80 @@
                 <div class="modal-actions">
                     <button type="button" class="cancel-modal-btn" onclick="closeEditModal()">Cancel</button>
                     <button type="submit" class="save-modal-btn">Save Changes</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Product Add Modal -->
+    <div id="add-modal" class="modal" style="display: none;">
+        <div class="modal-content glass-card">
+            <div class="modal-header">
+                <h2><i class="fas fa-plus"></i> Add New Product</h2>
+                <button class="close-modal-btn" onclick="closeAddModal()"><i class="fas fa-times"></i></button>
+            </div>
+            <form id="add-product-form" onsubmit="saveNewProduct(event)">
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label for="add-product-name">Product Name</label>
+                        <input type="text" id="add-product-name" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="add-product-category">Category</label>
+                        <select id="add-product-category" required>
+                            <option value="Cashew">Cashews</option>
+                            <option value="Dry Fruits">Dry Fruits & Seeds</option>
+                            <option value="Oats & Millets">Oats & Millets</option>
+                            <option value="Snacks & Breakfast">Snacks & Breakfast</option>
+                            <option value="Spices">Spices & Pastes</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="add-product-price">Price (₹)</label>
+                            <input type="number" id="add-product-price" min="0" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="add-product-discount">Discount (%)</label>
+                            <input type="number" id="add-product-discount" min="0" max="99" value="0" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="add-product-unit">Unit (e.g., kg, 500g)</label>
+                            <input type="text" id="add-product-unit" required>
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="add-product-stock">Initial Stock</label>
+                            <input type="number" id="add-product-stock" min="0" value="50" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="add-product-tag">Tag / Badge (e.g., Premium Quality)</label>
+                            <input type="text" id="add-product-tag" required>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="add-product-img">Image Path</label>
+                        <input type="text" id="add-product-img" value="pics/products/croast.jpg" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="add-product-desc">Description / Specifications</label>
+                        <textarea id="add-product-desc" rows="3"></textarea>
+                    </div>
+
+                    <div class="form-group" style="margin-top: 15px; padding: 10px; background: rgba(46, 204, 113, 0.1); border: 1px dashed #2ecc71; border-radius: 8px; text-align: center;">
+                        <span style="font-size: 0.9rem; font-weight: 700; color: #2ecc71;">Calculated Discounted Price: ₹<span id="add-product-preview-price">0</span></span>
+                    </div>
+                </div>
+                
+                <div class="modal-actions">
+                    <button type="button" class="cancel-modal-btn" onclick="closeAddModal()">Cancel</button>
+                    <button type="submit" class="save-modal-btn">Add Product</button>
                 </div>
             </form>
         </div>

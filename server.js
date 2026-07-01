@@ -840,6 +840,38 @@ app.post('/api/admin/orders/confirm', requireAdmin, async (req, res) => {
     }
 });
 
+// ADD NEW PRODUCT
+app.post('/api/admin/products/add', requireAdmin, async (req, res) => {
+    const { name, price, unit, tag, cat, img, description, stock, discount_percent } = req.body;
+    if (!name || price === undefined || !unit || !cat) {
+        return res.status(400).json({ error: 'Missing required product parameters (name, price, unit, cat)' });
+    }
+    try {
+        const maxIdResult = await query('SELECT MAX(id) AS max_id FROM products');
+        const nextId = (maxIdResult.length > 0 && maxIdResult[0].max_id !== null) ? parseInt(maxIdResult[0].max_id) + 1 : 1;
+
+        await query(
+            'INSERT INTO products (id, name, price, unit, tag, cat, img, description, stock, discount_percent) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
+            [
+                nextId,
+                name,
+                parseInt(price),
+                unit,
+                tag || '',
+                cat,
+                img || 'pics/products/croast.jpg',
+                description || '',
+                parseInt(stock) || 0,
+                parseInt(discount_percent) || 0
+            ]
+        );
+        res.json({ success: true, message: 'Product added successfully', productId: nextId });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: 'Internal Server Error adding new product' });
+    }
+});
+
 // UPDATE PRODUCT DETAILS (Name, price, category, unit, tag, img, description, discount_percent)
 app.post('/api/admin/products/update', requireAdmin, async (req, res) => {
     const { productId, name, price, unit, tag, cat, img, description, stock, discount_percent } = req.body;
