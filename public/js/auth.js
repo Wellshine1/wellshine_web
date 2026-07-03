@@ -716,6 +716,8 @@ async function submitOTP(e) {
 
 // Navigation injection
 function setupAuthPillButton() {
+    if (document.getElementById("auth-pill-container")) return;
+
     const dropdown = document.querySelector(".header-nav .dropdown, .pill-nav .dropdown, .shop-header .header-right");
     if (!dropdown) return;
 
