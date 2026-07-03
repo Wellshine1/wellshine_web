@@ -18,6 +18,61 @@
             }
         })();
     </script>
+    <!-- Inline styles to bypass aggressive mobile browser cache -->
+    <style>
+        @media (max-width: 768px) {
+            .logo-container {
+                display: none !important;
+            }
+            .nav-logo-link {
+                display: inline-flex !important;
+                align-items: center;
+                margin-right: 4px !important;
+            }
+            .nav-pill-logo {
+                height: 18px !important;
+                width: auto !important;
+                object-fit: contain !important;
+                vertical-align: middle !important;
+            }
+            .pill-nav a[href="#home"],
+            .pill-nav a[href="#about"],
+            .pill-nav a[href="#contact"] {
+                display: none !important;
+            }
+            .pill-nav { 
+                position: fixed !important;
+                top: 15px !important;
+                left: 50% !important;
+                width: fit-content !important;
+                max-width: 90% !important;
+                transform: translateX(-50%) !important;
+                display: flex !important;
+                justify-content: center !important;
+                align-items: center !important;
+                padding: 5px 12px !important;
+                gap: 12px !important;
+                border-radius: 30px !important;
+            }
+            .pill-nav.nav-hidden {
+                transform: translate(-50%, -100px) !important;
+            }
+            .pill-nav a {
+                font-size: 0.72rem !important;
+                letter-spacing: 0.5px !important;
+                white-space: nowrap !important;
+            }
+            .theme-toggle-btn {
+                width: 24px !important;
+                height: 24px !important;
+                font-size: 0.75rem !important;
+            }
+            .login-pill-btn, .profile-pill-btn {
+                padding: 4px 8px !important;
+                font-size: 0.7rem !important;
+            }
+        }
+    </style>
 </head>
 <body>
 
