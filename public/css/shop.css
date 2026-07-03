@@ -1106,3 +1106,25 @@ body {
     color: #ff1744;
     font-weight: 700;
 }
+
+.prod-desc-preview {
+    font-size: 0.75rem;
+    color: var(--body-text-muted);
+    margin: 6px 0 0 0;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    height: 32px;
+    line-height: 1.3;
+    text-align: center;
+}
+
+@media (max-width: 768px) {
+    .prod-desc-preview {
+        display: block !important;
+        overflow: visible !important;
+        height: auto !important;
+        -webkit-line-clamp: unset !important;
+    }
+}

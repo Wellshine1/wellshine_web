@@ -133,7 +133,7 @@ function renderShop(searchQuery = "") {
                     <span class="tag-label">${item.tag}</span>
                     <h3 class="prod-title">${item.name}</h3>
                 </div>
-                <p class="prod-desc-preview" onclick="openQuickView(${item.id})" style="font-size: 0.75rem; color: var(--body-text-muted); margin: 6px 0 10px 0; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; height: 32px; line-height: 1.3; cursor: pointer; text-align: center;">
+                <p class="prod-desc-preview" onclick="openQuickView(${item.id})">
                     ${item.description || 'Premium select wholesale item.'}
                 </p>
                 <p class="price-text">
