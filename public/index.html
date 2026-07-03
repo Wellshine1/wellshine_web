@@ -6,7 +6,8 @@
     <title>Wellshine Distributors | Official Hub</title>
     <meta name="description" content="Official wholesale distributor of CDC Cashews (Govt. of Kerala), premium dry fruits, millets, spices, and snacks in Pala, Kerala. Wellshine Distributors.">
     <meta name="keywords" content="CDC Cashews, Wellshine, Distributors, Pala, Kerala, Wholesale, Cashews, Dry Fruits, Oats, Millets, Spices, Food Distribution">
-    <link rel="stylesheet" href="css/style.css?v=1.4">
+    <link rel="stylesheet" href="css/style.css?v=1.5">
+    <link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- Early theme check to prevent flash -->
     <script>
@@ -55,7 +56,7 @@
     </nav>
 
     <section id="home" class="hero-content">
-        <div>
+        <div data-aos="zoom-out" data-aos-duration="1500">
             <h1 class="main-title">WELLSHINE</h1>
             <p class="sub-title">DISTRIBUTORS</p>
             <p class="govt-tag">Official Distributor of CDC Cashew (Govt. of Kerala)</p>
@@ -65,9 +66,9 @@
 
     <!-- FEATURED CAROUSEL SECTION -->
     <section id="featured-carousel" class="carousel-section">
-        <h2 class="section-heading">Bestsellers</h2>
+        <h2 class="section-heading" data-aos="fade-up">Bestsellers</h2>
         
-        <div class="carousel-container">
+        <div class="carousel-container" data-aos="zoom-in" data-aos-duration="1200">
             <!-- Left Arrow -->
             <button class="carousel-arrow prev-arrow" onclick="moveSlide(-1)">&lt;</button>
             
@@ -88,7 +89,7 @@
     </section>
 
     <section id="about">
-        <div class="clean-card">
+        <div class="clean-card" data-aos="fade-up">
             <h2 class="section-heading">Our Legacy</h2>
             <p class="about-text">
                 Wellshine Distributors stands as a pillar of quality in <strong>Pala, Kerala</strong>. We specialize in the wholesale distribution of premium food products, bridging the gap between nature’s harvest and your retail shelves. As the <strong>authorized distributor for CDC Cashews (Govt. of Kerala)</strong>, we uphold the highest standards of purity and trust.
@@ -98,7 +99,7 @@
     <section id="why-choose-us">
         <div class="why-choose-grid">
             <!-- Left Side: Clover Leaf Collage -->
-            <div class="clover-collage">
+            <div class="clover-collage" data-aos="fade-right" data-aos-duration="1000">
                 <div class="leaf leaf-tl">
                     <img src="pics/products/cloves.jpg" alt="Cloves">
                 </div>
@@ -114,7 +115,7 @@
             </div>
             
             <!-- Right Side: Content -->
-            <div class="why-choose-content">
+            <div class="why-choose-content" data-aos="fade-left" data-aos-duration="1000">
                 <h2 class="why-choose-heading">Why Choose Us?</h2>
                 <ul class="why-choose-list">
                     <li>
@@ -136,7 +137,7 @@
 
     <div class="bottom-layout">
         <section id="contact">
-            <div class="contact-glass-box">
+            <div class="contact-glass-box" data-aos="fade-up">
                 <h2 class="section-heading">DIRECT CONNECT</h2>
                 <div class="contact-icons">
                     <a href="https://wa.me/919447097212" target="_blank"><i class="fab fa-whatsapp"></i></a>
@@ -146,7 +147,7 @@
         </section>
 
         <footer id="footer-area">
-            <div class="map-box">
+            <div class="map-box" data-aos="fade-in">
                 <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3932.6096581853894!2d76.68495257301636!3d9.714316949998464!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3b07cdcd01ed01b3%3A0xb08989f2d73a15f0!2sWELL%20SHINE!5e0!3m2!1sen!2sin!4v1779084594591!5m2!1sen!2sin" width="100%" height="100%" style="border:0;" allowfullscreen="" loading="lazy"></iframe>
             </div>
 
@@ -396,5 +397,7 @@
     </script>
 
     <script src="js/auth.js?v=1.1"></script>
+    <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
+    <script>AOS.init({ once: true });</script>
 </body>
 </html>

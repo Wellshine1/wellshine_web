@@ -610,14 +610,24 @@ footer {
         display: none !important;
     }
     .pill-nav { 
-        width: fit-content; 
-        max-width: 95%; 
-        gap: 3px; 
-        padding: 3px 6px; 
+        position: fixed;
         top: 15px;
+        left: 5%;
+        width: 90%;
+        max-width: 480px;
+        transform: none !important;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 8px 12px;
+        gap: 8px;
+    }
+    .pill-nav.nav-hidden {
+        top: -100px !important;
+        transform: none !important;
     }
     .pill-nav a {
-        font-size: 0.6rem;
+        font-size: 0.72rem;
         letter-spacing: 0.5px;
         white-space: nowrap;
     }
