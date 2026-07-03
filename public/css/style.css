@@ -596,10 +596,10 @@ footer {
     .nav-logo-link {
         display: inline-flex !important;
         align-items: center;
-        margin-right: 6px;
+        margin-right: 4px;
     }
     .nav-pill-logo {
-        height: 20px;
+        height: 18px;
         width: auto;
         object-fit: contain;
         vertical-align: middle;
@@ -612,19 +612,19 @@ footer {
     .pill-nav { 
         position: fixed;
         top: 15px;
-        left: 5%;
-        width: 90%;
-        max-width: 480px;
-        transform: none !important;
+        left: 50%;
+        width: fit-content;
+        max-width: 90%;
+        transform: translateX(-50%) !important;
         display: flex;
-        justify-content: space-between;
+        justify-content: center;
         align-items: center;
-        padding: 8px 12px;
-        gap: 8px;
+        padding: 5px 12px;
+        gap: 12px;
+        border-radius: 30px;
     }
     .pill-nav.nav-hidden {
-        top: -100px !important;
-        transform: none !important;
+        transform: translate(-50%, -100px) !important;
     }
     .pill-nav a {
         font-size: 0.72rem;
@@ -632,13 +632,13 @@ footer {
         white-space: nowrap;
     }
     .theme-toggle-btn {
-        width: 26px;
-        height: 26px;
+        width: 24px;
+        height: 24px;
         font-size: 0.75rem;
     }
     .login-pill-btn, .profile-pill-btn {
-        padding: 4px 6px !important;
-        font-size: 0.6rem !important;
+        padding: 4px 8px !important;
+        font-size: 0.7rem !important;
     }
     .dropdown-toggle {
         display: inline-flex !important;
