@@ -84,6 +84,34 @@ body {
     100% { opacity: 0; }
 }
 
+/* --- FLOATING HEADER LOGO --- */
+.logo-container {
+    position: absolute;
+    top: 25px;
+    left: 6%;
+    z-index: 2000;
+    cursor: pointer;
+}
+.header-logo {
+    height: 55px;
+    width: auto;
+    object-fit: contain;
+    transition: transform 0.3s ease;
+}
+.header-logo:hover {
+    transform: scale(1.05);
+}
+
+@media (max-width: 768px) {
+    .logo-container {
+        top: 15px;
+        left: 4%;
+    }
+    .header-logo {
+        height: 32px;
+    }
+}
+
 /* --- HOME PILL NAV --- */
 .pill-nav {
     position: fixed; 

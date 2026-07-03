@@ -102,6 +102,22 @@ body {
     color: var(--gold);
 }
 
+.header-logo {
+    height: 45px;
+    width: auto;
+    object-fit: contain;
+    transition: transform 0.3s ease;
+}
+.header-logo:hover {
+    transform: scale(1.05);
+}
+
+@media (max-width: 768px) {
+    .header-logo {
+        height: 32px;
+    }
+}
+
 .back-home i {
     margin-right: 5px;
     font-size: 0.9rem;
