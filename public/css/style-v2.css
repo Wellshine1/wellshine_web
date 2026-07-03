@@ -612,10 +612,12 @@ footer {
     .pill-nav { 
         position: fixed;
         top: 15px;
-        left: 50%;
+        left: 0;
+        right: 0;
+        margin: 0 auto;
         width: fit-content;
         max-width: 90%;
-        transform: translateX(-50%) !important;
+        transform: none !important;
         display: flex;
         justify-content: center;
         align-items: center;
@@ -624,7 +626,8 @@ footer {
         border-radius: 30px;
     }
     .pill-nav.nav-hidden {
-        transform: translate(-50%, -100px) !important;
+        top: -100px !important;
+        transform: none !important;
     }
     .pill-nav a {
         font-size: 0.72rem;
