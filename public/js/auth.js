@@ -766,12 +766,14 @@ function updateAuthPillUI(isLoggedIn, user = null) {
     }
 
     // Force browser reflow to recalculate translateX centering (fixes mobile Chrome translation bug on load)
-    const nav = document.querySelector('.pill-nav');
-    if (nav) {
-        nav.style.display = 'none';
-        nav.offsetHeight; // trigger reflow
-        nav.style.display = '';
-    }
+    setTimeout(() => {
+        const nav = document.querySelector('.pill-nav');
+        if (nav) {
+            nav.style.display = 'none';
+            nav.offsetHeight; // trigger reflow
+            nav.style.display = '';
+        }
+    }, 150);
 }
 
 window.toggleProfileDropdown = function() {
