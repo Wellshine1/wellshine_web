@@ -646,20 +646,20 @@ document.addEventListener('DOMContentLoaded', () => {
             const heading = isIndividual ? 'INDIVIDUAL ORDER' : 'WHOLESALE ORDER';
             const nameLabel = isIndividual ? 'Customer Name' : 'Business/Shop Name';
 
-            let msg = `*WELLSHINE ${heading}*%0A%0A`;
-            msg += `*Order Number:* #${displayOrderNum}%0A`;
-            msg += `*${nameLabel}:* ${name}%0A`;
-            msg += `*Delivery Address:* ${addr}%0A`;
+            let msg = `*WELLSHINE ${heading}*\n\n`;
+            msg += `*Order Number:* #${displayOrderNum}\n`;
+            msg += `*${nameLabel}:* ${name}\n`;
+            msg += `*Delivery Address:* ${addr}\n`;
             if (instructions) {
-                msg += `*Special Instructions:* ${instructions}%0A`;
+                msg += `*Special Instructions:* ${instructions}\n`;
             }
-            msg += `%0A*ORDERED ITEMS:*%0A`;
+            msg += `\n*ORDERED ITEMS:*\n`;
             
             orderItems.forEach((item, index) => {
-                msg += `${index + 1}. ${item.name} (${item.unit})%0A   Quantity: ${item.quantity} x ₹${item.price} = *₹${item.subtotal}*%0A`;
+                msg += `${index + 1}. ${item.name} (${item.unit})\n   Quantity: ${item.quantity} x ₹${item.price} = *₹${item.subtotal}*\n`;
             });
             
-            msg += `%0A*TOTAL ESTIMATED PRICE: ₹${grandTotal}*%0A%0A`;
+            msg += `\n*TOTAL ESTIMATED PRICE: ₹${grandTotal}*\n\n`;
             msg += `Thank you for ordering with Wellshine! We will confirm your delivery shortly.`;
             
             // Clear cart
@@ -670,7 +670,7 @@ document.addEventListener('DOMContentLoaded', () => {
             await fetchCatalog();
 
             // Redirect
-            window.open(`https://wa.me/919447097212?text=${msg}`, '_blank');
+            window.open(`https://wa.me/919447097212?text=${encodeURIComponent(msg)}`, '_blank');
         };
     }
 
