@@ -312,28 +312,140 @@ footer {
     filter: none;
     opacity: 0.85;
 }
-.footer-bottom { 
-    display: flex; 
-    justify-content: space-between; 
-    align-items: center;
-    flex-wrap: wrap; 
-    gap: 30px; 
-    opacity: 0.65; 
-    font-size: 0.95rem; 
-    border-top: 1px solid var(--border-color);
-    padding-top: 30px;
+/* --- FOOTER REDESIGN STYLES --- */
+.footer-columns {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr 1.2fr;
+    gap: 40px;
+    margin-bottom: 50px;
 }
-.footer-bottom h3 {
+.footer-col h3 {
     color: var(--gold);
-    font-weight: 800;
+    font-size: 1.1rem;
+    font-weight: 700;
+    margin-bottom: 20px;
+    letter-spacing: 0.5px;
 }
-.credits { 
-    text-align: center; 
-    margin-top: 50px; 
-    opacity: 0.35; 
-    font-size: 0.75rem; 
-    border-top: 1px solid rgba(255,255,255,0.05); 
-    padding-top: 25px; 
+.footer-logo {
+    height: 50px;
+    width: auto;
+    object-fit: contain;
+    margin-bottom: 20px;
+}
+.brand-desc {
+    font-size: 0.88rem;
+    line-height: 1.6;
+    color: var(--body-text-muted);
+}
+.footer-col ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+.footer-col ul li {
+    margin-bottom: 12px;
+}
+.footer-col ul li a {
+    text-decoration: none;
+    color: var(--body-text-muted);
+    font-size: 0.9rem;
+    transition: color 0.3s ease;
+}
+.footer-col ul li a:hover {
+    color: var(--gold);
+}
+.social-links {
+    display: flex;
+    gap: 12px;
+}
+.social-links a {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 38px;
+    height: 38px;
+    border-radius: 6px;
+    background: var(--border-color);
+    color: var(--body-text);
+    font-size: 1.1rem;
+    text-decoration: none;
+    transition: all 0.3s ease;
+}
+.social-links a:hover {
+    background: var(--gold);
+    color: #000;
+    transform: translateY(-2px);
+}
+.hours-col p {
+    font-size: 0.88rem;
+    line-height: 1.6;
+    color: var(--body-text-muted);
+    margin-bottom: 8px;
+}
+
+/* Contact Bar */
+.footer-contact-bar {
+    display: grid;
+    grid-template-columns: 1.2fr 1fr 1fr;
+    gap: 30px;
+    margin-bottom: 30px;
+    padding-top: 20px;
+}
+.contact-box {
+    display: flex;
+    align-items: flex-start;
+    gap: 15px;
+}
+.contact-icon {
+    font-size: 1.3rem;
+    color: var(--gold);
+    margin-top: 2px;
+}
+.contact-text {
+    font-size: 0.88rem;
+    line-height: 1.5;
+    color: var(--body-text);
+}
+.footer-divider {
+    border: none;
+    border-top: 1px solid var(--border-color);
+    margin: 30px 0 20px;
+    opacity: 0.5;
+}
+.credits {
+    text-align: center;
+    font-size: 0.8rem;
+    color: var(--body-text-muted);
+    margin-top: 0 !important;
+    padding-top: 0 !important;
+    border-top: none !important;
+}
+
+/* Media Queries for responsive footer columns */
+@media (max-width: 992px) {
+    .footer-columns {
+        grid-template-columns: 1fr 1fr;
+        gap: 30px;
+    }
+    .footer-contact-bar {
+        grid-template-columns: 1fr;
+        gap: 20px;
+    }
+}
+@media (max-width: 576px) {
+    .footer-columns {
+        grid-template-columns: 1fr;
+        gap: 30px;
+        text-align: center;
+    }
+    .social-links {
+        justify-content: center;
+    }
+    .contact-box {
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+    }
 }
 
 /* --- MOBILE RESPONSIVE MEDIA QUERIES --- */
@@ -437,11 +549,6 @@ footer {
     .map-box {
         height: 280px;
         border-radius: 15px;
-    }
-    .footer-bottom {
-        flex-direction: column;
-        text-align: center;
-        gap: 20px;
     }
 }
 
