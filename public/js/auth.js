@@ -374,6 +374,10 @@ function injectAuthModal() {
                         <i class="fas fa-map-marker-alt auth-input-icon"></i>
                         <textarea id="signup-address" placeholder="Full Billing/Delivery Address" rows="2" required></textarea>
                     </div>
+                    <div class="auth-input-wrap">
+                        <i class="fas fa-map-pin auth-input-icon"></i>
+                        <input type="text" id="signup-pincode" placeholder="Delivery Pin Code (6 Digits)" required pattern="[0-9]{6}" maxlength="6" autocomplete="postal-code">
+                    </div>
                     <button type="submit" class="auth-submit-btn">Create Account</button>
                     <div class="auth-error" id="signup-error"></div>
                     <div class="auth-success-msg" id="signup-success">Account created! Switch to Sign In to login.</div>
@@ -515,7 +519,7 @@ function onLoggedIn(user) {
     const custAddrInput = document.getElementById("cust-address");
     if (custNameInput && custAddrInput) {
         custNameInput.value = user.shop_name;
-        custAddrInput.value = user.address;
+        custAddrInput.value = user.address + (user.pincode ? ` - PIN: ${user.pincode}` : '');
         
         if (user.account_type === 'Individual') {
             custNameInput.placeholder = "Your Full Name";
@@ -628,6 +632,7 @@ async function submitSignUp(e) {
     const password = document.getElementById("signup-password").value;
     const shop_name = document.getElementById("signup-shop").value.trim();
     const address = document.getElementById("signup-address").value.trim();
+    const pincode = document.getElementById("signup-pincode").value.trim();
     const account_type = document.getElementById("signup-account-type").value;
     const errorEl = document.getElementById("signup-error");
     const successEl = document.getElementById("signup-success");
@@ -639,7 +644,7 @@ async function submitSignUp(e) {
         const res = await fetch("/api/auth/register", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ email, password, shop_name, address, account_type })
+            body: JSON.stringify({ email, password, shop_name, address, account_type, pincode })
         });
         
         const data = await res.json();

@@ -236,6 +236,7 @@ async function setupTables() {
                 shop_name VARCHAR(255) NOT NULL,
                 address TEXT NOT NULL,
                 account_type VARCHAR(50) DEFAULT 'Business',
+                pincode VARCHAR(20) DEFAULT '',
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
             )
         `);
@@ -266,6 +267,7 @@ async function setupTables() {
                 shop_name VARCHAR(255) NOT NULL,
                 address TEXT NOT NULL,
                 account_type VARCHAR(50) DEFAULT 'Business',
+                pincode VARCHAR(20) DEFAULT '',
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
             )
         `);
@@ -298,6 +300,18 @@ async function setupTables() {
             await query("ALTER TABLE users ADD COLUMN account_type VARCHAR(50) DEFAULT 'Business'");
         }
         console.log("Verified: 'account_type' column is present in users.");
+    } catch (err) {
+        // Safe to ignore if column already exists
+    }
+
+    // Ensure pincode column exists in users table (migration)
+    try {
+        if (dbType === 'postgres' || dbType === 'postgresql') {
+            await query("ALTER TABLE users ADD COLUMN IF NOT EXISTS pincode VARCHAR(20) DEFAULT ''");
+        } else {
+            await query("ALTER TABLE users ADD COLUMN pincode VARCHAR(20) DEFAULT ''");
+        }
+        console.log("Verified: 'pincode' column is present in users.");
     } catch (err) {
         // Safe to ignore if column already exists
     }
@@ -476,12 +490,22 @@ app.post('/api/orders', requireAuth, async (req, res) => {
 
     try {
         // 1. Insert order to DB with 'Pending' status
-        await query(
-            "INSERT INTO orders (cust_name, cust_address, items, total_price, status) VALUES (?, ?, ?, ?, 'Pending')",
-            [cust_name, cust_address, JSON.stringify(items), total_price]
-        );
+        let orderId;
+        if (dbType === 'postgres' || dbType === 'postgresql') {
+            const insertResult = await query(
+                "INSERT INTO orders (cust_name, cust_address, items, total_price, status) VALUES (?, ?, ?, ?, 'Pending') RETURNING id",
+                [cust_name, cust_address, JSON.stringify(items), total_price]
+            );
+            orderId = insertResult[0].id;
+        } else {
+            const insertResult = await query(
+                "INSERT INTO orders (cust_name, cust_address, items, total_price, status) VALUES (?, ?, ?, ?, 'Pending')",
+                [cust_name, cust_address, JSON.stringify(items), total_price]
+            );
+            orderId = insertResult.insertId;
+        }
 
-        res.status(201).json({ success: true, message: 'Order logged successfully!' });
+        res.status(201).json({ success: true, message: 'Order logged successfully!', orderId });
     } catch (err) {
         console.error(err);
         res.status(500).json({ error: 'Internal Server Error saving wholesale order' });
@@ -646,8 +670,8 @@ app.post('/api/auth/send-otp', async (req, res) => {
 
 // POST USER SIGNUP
 app.post('/api/auth/register', async (req, res) => {
-    const { email, password, shop_name, address, account_type } = req.body;
-    if (!email || !password || !shop_name || !address) {
+    const { email, password, shop_name, address, account_type, pincode } = req.body;
+    if (!email || !password || !shop_name || !address || !pincode) {
         return res.status(400).json({ error: 'Missing required registration parameters' });
     }
     const finalAccountType = account_type === 'Individual' ? 'Individual' : 'Business';
@@ -665,8 +689,8 @@ app.post('/api/auth/register', async (req, res) => {
 
         // 4. Insert user into database
         await query(
-            'INSERT INTO users (email, password_hash, shop_name, address, account_type) VALUES (?, ?, ?, ?, ?)',
-            [cleanEmail, passwordHash, shop_name.trim(), address.trim(), finalAccountType]
+            'INSERT INTO users (email, password_hash, shop_name, address, account_type, pincode) VALUES (?, ?, ?, ?, ?, ?)',
+            [cleanEmail, passwordHash, shop_name.trim(), address.trim(), finalAccountType, pincode.trim()]
         );
 
         // 5. Clean up OTP record
@@ -717,7 +741,8 @@ app.post('/api/auth/login', async (req, res) => {
                 email: user.email,
                 shop_name: user.shop_name,
                 address: user.address,
-                account_type: user.account_type
+                account_type: user.account_type,
+                pincode: user.pincode
             }
         });
     } catch (err) {
@@ -729,7 +754,7 @@ app.post('/api/auth/login', async (req, res) => {
 // GET CURRENT USER PROFILE
 app.get('/api/auth/me', requireAuth, async (req, res) => {
     try {
-        const users = await query('SELECT id, email, shop_name, address, account_type FROM users WHERE id = ?', [req.user.id]);
+        const users = await query('SELECT id, email, shop_name, address, account_type, pincode FROM users WHERE id = ?', [req.user.id]);
         if (users.length === 0) {
             return res.status(404).json({ error: 'User profile not found' });
         }

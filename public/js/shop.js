@@ -613,6 +613,7 @@ document.addEventListener('DOMContentLoaded', () => {
             });
 
             // 2. Post order log to database (with Authorization token)
+            let orderNumber = null;
             try {
                 const token = window.getAuthToken ? window.getAuthToken() : '';
                 const response = await fetch('/api/orders', {
@@ -630,15 +631,24 @@ document.addEventListener('DOMContentLoaded', () => {
                 });
                 
                 if (!response.ok) throw new Error('Backend failed to log order');
-                console.log('Order successfully logged to DB.');
+                const data = await response.json();
+                orderNumber = data.orderId;
+                console.log('Order successfully logged to DB. Order ID:', orderNumber);
             } catch (err) {
                 console.error('Database logging failed:', err);
                 // We will still allow the WhatsApp redirect to succeed so they don't block the user's order!
             }
 
+            const displayOrderNum = orderNumber || ('TMP-' + Date.now().toString().slice(-6));
+
             // 3. Compile and redirect to WhatsApp
-            let msg = `*WELLSHINE WHOLESALE ORDER*%0A%0A`;
-            msg += `*Business/Shop Name:* ${name}%0A`;
+            const isIndividual = (window.currentCustomer && window.currentCustomer.account_type === 'Individual');
+            const heading = isIndividual ? 'INDIVIDUAL ORDER' : 'WHOLESALE ORDER';
+            const nameLabel = isIndividual ? 'Customer Name' : 'Business/Shop Name';
+
+            let msg = `*WELLSHINE ${heading}*%0A%0A`;
+            msg += `*Order Number:* #${displayOrderNum}%0A`;
+            msg += `*${nameLabel}:* ${name}%0A`;
             msg += `*Delivery Address:* ${addr}%0A`;
             if (instructions) {
                 msg += `*Special Instructions:* ${instructions}%0A`;
