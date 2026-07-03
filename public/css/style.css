@@ -102,15 +102,8 @@ body {
     transform: scale(1.05);
 }
 
-@media (max-width: 768px) {
-    .logo-container {
-        top: 15px;
-        left: 50%;
-        transform: translateX(-50%);
-    }
-    .header-logo {
-        height: 38px;
-    }
+.nav-logo-link {
+    display: none;
 }
 
 /* --- HOME PILL NAV --- */
@@ -350,6 +343,20 @@ footer {
 }
 
 @media (max-width: 768px) {
+    .logo-container {
+        display: none !important;
+    }
+    .nav-logo-link {
+        display: inline-flex !important;
+        align-items: center;
+        margin-right: 8px;
+    }
+    .nav-pill-logo {
+        height: 24px;
+        width: auto;
+        object-fit: contain;
+        vertical-align: middle;
+    }
     .pill-nav a[href="#about"],
     .pill-nav a[href="#contact"] {
         display: none;
@@ -359,7 +366,7 @@ footer {
         max-width: 95%; 
         gap: 6px; 
         padding: 6px 10px; 
-        top: 70px;
+        top: 15px;
     }
     .pill-nav a {
         font-size: 0.65rem;
