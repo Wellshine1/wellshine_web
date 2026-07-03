@@ -764,16 +764,6 @@ function updateAuthPillUI(isLoggedIn, user = null) {
             </button>
         `;
     }
-
-    // Force browser reflow to recalculate translateX centering (fixes mobile Chrome translation bug on load)
-    setTimeout(() => {
-        const nav = document.querySelector('.pill-nav');
-        if (nav) {
-            nav.style.display = 'none';
-            nav.offsetHeight; // trigger reflow
-            nav.style.display = '';
-        }
-    }, 150);
 }
 
 window.toggleProfileDropdown = function() {

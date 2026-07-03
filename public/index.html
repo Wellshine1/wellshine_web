@@ -6,7 +6,7 @@
     <title>Wellshine Distributors | Official Hub</title>
     <meta name="description" content="Official wholesale distributor of CDC Cashews (Govt. of Kerala), premium dry fruits, millets, spices, and snacks in Pala, Kerala. Wellshine Distributors.">
     <meta name="keywords" content="CDC Cashews, Wellshine, Distributors, Pala, Kerala, Wholesale, Cashews, Dry Fruits, Oats, Millets, Spices, Food Distribution">
-    <link rel="stylesheet" href="css/style-v2.css">
+    <link rel="stylesheet" href="css/style-v2.css?v=1.7">
     <link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- Early theme check to prevent flash -->
@@ -40,25 +40,37 @@
             .pill-nav a[href="#contact"] {
                 display: none !important;
             }
-            .pill-nav { 
+            .nav-wrapper {
                 position: fixed !important;
                 top: 15px !important;
                 left: 0 !important;
-                right: 0 !important;
+                width: 100% !important;
+                display: flex !important;
+                justify-content: center !important;
+                align-items: center !important;
+                z-index: 2000 !important;
+                pointer-events: none !important;
+                transform: none !important;
+                transition: transform 0.4s cubic-bezier(0.165, 0.84, 0.44, 1), top 0.4s ease !important;
+            }
+            .nav-wrapper.nav-hidden {
+                top: -100px !important;
+            }
+            .pill-nav { 
+                position: relative !important;
+                top: 0 !important;
+                left: 0 !important;
                 margin: 0 auto !important;
                 width: 280px !important;
                 max-width: 90% !important;
                 transform: none !important;
+                pointer-events: auto !important;
                 display: flex !important;
                 justify-content: center !important;
                 align-items: center !important;
                 padding: 5px 12px !important;
                 gap: 12px !important;
                 border-radius: 30px !important;
-            }
-            .pill-nav.nav-hidden {
-                top: -100px !important;
-                transform: none !important;
             }
             .pill-nav a {
                 font-size: 0.72rem !important;
@@ -91,27 +103,29 @@
         <img src="pics/logo1.png" alt="Wellshine Logo" class="header-logo">
     </div>
 
-    <nav class="pill-nav">
-        <!-- Mobile Nav Logo -->
-        <a href="index.html" class="nav-logo-link">
-            <img src="pics/logo1.png" alt="Wellshine Logo" class="nav-pill-logo">
-        </a>
-        <a href="#home">Home</a>
-        <a href="#about">About</a>
-        <a href="products.html">Products</a>
-        <a href="#contact">Contact</a>
-        <div class="dropdown">
-            <a href="#" class="gold-link dropdown-toggle" onclick="event.preventDefault()">Shop <i class="fas fa-chevron-down" style="font-size:0.6rem; margin-left:3px; vertical-align: middle;"></i></a>
-            <div class="dropdown-menu">
-                <a href="shop.html"><i class="fas fa-store"></i> Wellshine Store</a>
-                <a href="https://www.amazon.in/s?me=A2PNVSMR4YUKPK" target="_blank"><i class="fab fa-amazon"></i> Amazon Store</a>
+    <div class="nav-wrapper">
+        <nav class="pill-nav">
+            <!-- Mobile Nav Logo -->
+            <a href="index.html" class="nav-logo-link">
+                <img src="pics/logo1.png" alt="Wellshine Logo" class="nav-pill-logo">
+            </a>
+            <a href="#home">Home</a>
+            <a href="#about">About</a>
+            <a href="products.html">Products</a>
+            <a href="#contact">Contact</a>
+            <div class="dropdown">
+                <a href="#" class="gold-link dropdown-toggle" onclick="event.preventDefault()">Shop <i class="fas fa-chevron-down" style="font-size:0.6rem; margin-left:3px; vertical-align: middle;"></i></a>
+                <div class="dropdown-menu">
+                    <a href="shop.html"><i class="fas fa-store"></i> Wellshine Store</a>
+                    <a href="https://www.amazon.in/s?me=A2PNVSMR4YUKPK" target="_blank"><i class="fab fa-amazon"></i> Amazon Store</a>
+                </div>
             </div>
-        </div>
-        <div id="auth-pill-container" class="profile-dropdown-container"></div>
-        <button id="theme-toggle" class="theme-toggle-btn" title="Toggle Theme">
-            <i class="fas fa-moon"></i>
-        </button>
-    </nav>
+            <div id="auth-pill-container" class="profile-dropdown-container"></div>
+            <button id="theme-toggle" class="theme-toggle-btn" title="Toggle Theme">
+                <i class="fas fa-moon"></i>
+            </button>
+        </nav>
+    </div>
 
     <section id="home" class="hero-content">
         <div data-aos="zoom-out" data-aos-duration="1500">
@@ -434,7 +448,7 @@
             // Scroll hide navigation behavior
             let lastScrollY = window.scrollY;
             window.addEventListener('scroll', () => {
-                const nav = document.querySelector('.pill-nav');
+                const nav = document.querySelector('.nav-wrapper');
                 if (!nav) return;
                 const currentScrollY = window.scrollY;
                 if (currentScrollY < 50) {
