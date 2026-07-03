@@ -615,7 +615,7 @@ footer {
         left: 0;
         right: 0;
         margin: 0 auto;
-        width: fit-content;
+        width: 280px;
         max-width: 90%;
         transform: none !important;
         display: flex;
