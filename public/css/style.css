@@ -105,10 +105,11 @@ body {
 @media (max-width: 768px) {
     .logo-container {
         top: 15px;
-        left: 4%;
+        left: 50%;
+        transform: translateX(-50%);
     }
     .header-logo {
-        height: 32px;
+        height: 38px;
     }
 }
 
@@ -358,7 +359,7 @@ footer {
         max-width: 95%; 
         gap: 6px; 
         padding: 6px 10px; 
-        top: 15px;
+        top: 70px;
     }
     .pill-nav a {
         font-size: 0.65rem;
