@@ -663,4 +663,25 @@ document.addEventListener('DOMContentLoaded', () => {
             window.open(`https://wa.me/919447097212?text=${msg}`, '_blank');
         };
     }
+
+    // Scroll hide navigation behavior
+    let lastScrollY = window.scrollY;
+    window.addEventListener('scroll', () => {
+        const nav = document.querySelector('.shop-header');
+        if (!nav) return;
+        const currentScrollY = window.scrollY;
+        if (currentScrollY < 50) {
+            nav.classList.remove('nav-hidden');
+            lastScrollY = currentScrollY;
+            return;
+        }
+        if (Math.abs(currentScrollY - lastScrollY) > 10) {
+            if (currentScrollY > lastScrollY) {
+                nav.classList.add('nav-hidden');
+            } else {
+                nav.classList.remove('nav-hidden');
+            }
+            lastScrollY = currentScrollY;
+        }
+    });
 });

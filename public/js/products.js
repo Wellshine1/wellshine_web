@@ -257,4 +257,25 @@ document.addEventListener('DOMContentLoaded', () => {
             updateThemeIcon();
         });
     }
+
+    // Scroll hide navigation behavior
+    let lastScrollY = window.scrollY;
+    window.addEventListener('scroll', () => {
+        const nav = document.querySelector('.products-header');
+        if (!nav) return;
+        const currentScrollY = window.scrollY;
+        if (currentScrollY < 50) {
+            nav.classList.remove('nav-hidden');
+            lastScrollY = currentScrollY;
+            return;
+        }
+        if (Math.abs(currentScrollY - lastScrollY) > 10) {
+            if (currentScrollY > lastScrollY) {
+                nav.classList.add('nav-hidden');
+            } else {
+                nav.classList.remove('nav-hidden');
+            }
+            lastScrollY = currentScrollY;
+        }
+    });
 });

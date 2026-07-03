@@ -87,7 +87,11 @@ body {
     backdrop-filter: blur(25px);
     -webkit-backdrop-filter: blur(25px);
     border-bottom: 1px solid var(--border-color);
-    transition: background-color 0.4s ease;
+    transition: transform 0.4s cubic-bezier(0.165, 0.84, 0.44, 1), background-color 0.4s ease;
+}
+
+.products-header.nav-hidden {
+    transform: translateY(-100%) !important;
 }
 
 .back-home { 
