@@ -426,6 +426,7 @@ app.get('/api/products', async (req, res) => {
                     WHEN cat = 'Snacks & Breakfast' THEN 6
                     ELSE 7
                 END) ASC,
+                (CASE WHEN id IN (32, 34, 39, 51) THEN 1 ELSE 0 END) ASC,
                 id ASC
         `);
         res.json(products);
