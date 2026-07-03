@@ -376,7 +376,18 @@ async function seedProducts() {
         { id: 32, name: "Bakers Ginger Garlic Paste", price: 130, unit: "kg", tag: "Commercial Bulk", cat: "Spices", img: "pics/products/ggpaste.jpg", desc: "Commercial grade ginger-garlic paste for restaurants and bulk cooking." },
         { id: 34, name: "Palm Candy Special (Panakalkandam)", price: 140, unit: "250g", tag: "Traditional Pure", cat: "Spices", img: "pics/products/palm-candy.jpg", desc: "Unrefined palm sugar candy, traditional throat soother and sweetener." },
         { id: 39, name: "Premium Arrowroot Powder", price: 600, unit: "500g", tag: "100% Organic", cat: "Spices", img: "pics/products/arrowroot.jpg", desc: "Pure organic arrowroot starch powder (Koova Podi), highly cooling for stomach." },
-        { id: 51, name: "Chukku Kappi (Dry Ginger Coffee)", price: 90, unit: "150g", tag: "Traditional Herbal", cat: "Spices", img: "pics/products/chukku-kappi.jpg", desc: "Dry ginger black coffee powder blended with black pepper, cumin, and basil." }
+        { id: 51, name: "Chukku Kappi (Dry Ginger Coffee)", price: 90, unit: "150g", tag: "Traditional Herbal", cat: "Spices", img: "pics/products/chukku-kappi.jpg", desc: "Dry ginger black coffee powder blended with black pepper, cumin, and basil." },
+        { id: 52, name: "Premium Mace Flower", price: 350, unit: "100g", tag: "Handpicked Pure", cat: "Spices", img: "pics/products/mace-flower.jpg", desc: "Premium dried mace flower (Jadipathri), rich warm aroma and crimson color." },
+        { id: 53, name: "Whole Star Anise", price: 120, unit: "150g", tag: "Highly Aromatic", cat: "Spices", img: "pics/products/star-anise.jpg", desc: "Whole star anise pods (Thakkolam), aromatic spice for biryani and masalas." },
+        { id: 54, name: "Ceylon Cinnamon Bark", price: 150, unit: "250g", tag: "Premium Grade", cat: "Spices", img: "pics/products/cinammon.jpg", desc: "High-grade Ceylon cinnamon bark sticks (Karugapatta), sweet and woody flavor." },
+        { id: 55, name: "Selected Dried Cloves", price: 250, unit: "200g", tag: "Rich Aroma", cat: "Spices", img: "pics/products/cloves.jpg", desc: "Handpicked dried cloves (Grampoo), intense flavor and high oil content." },
+        { id: 56, name: "Premium White Pepper", price: 320, unit: "250g", tag: "Spice Special", cat: "Spices", img: "pics/products/whitepepper.jpg", desc: "Premium white pepper kernels (Vella Kurumulaku), hot taste and clean aroma." },
+        { id: 57, name: "Whole Nutmeg with Shell", price: 180, unit: "250g", tag: "Natural Grade", cat: "Spices", img: "pics/products/nutmeg.jpg", desc: "Whole nutmeg seeds with outer shell (Jathikka), warm sweet spice." },
+        { id: 58, name: "Premium Black Cardamom", price: 280, unit: "200g", tag: "Smoky Flavor", cat: "Spices", img: "pics/products/black-cardamom.jpg", desc: "Premium black cardamom pods, smoky flavor profile for savory dishes." },
+        { id: 59, name: "Aromatic Green Cardamom", price: 380, unit: "250g", tag: "Kerala Quality", cat: "Spices", img: "pics/products/cardamom.jpg", desc: "Aromatic green cardamom capsules (Elakka), premium grade with large pods." },
+        { id: 60, name: "Premium Black Pepper", price: 190, unit: "250g", tag: "High Range", cat: "Spices", img: "pics/products/black-pepper.jpg", desc: "Premium black pepper kernels (Kurumulaku), sourced from high-range farms." },
+        { id: 61, name: "Dried Kudampuli (Cambodge)", price: 140, unit: "250g", tag: "Kerala Special", cat: "Spices", img: "pics/products/cambodge.jpg", desc: "Dried Garcinia Cambogia (Kudampuli), traditional souring agent for fish curries." },
+        { id: 62, name: "Shelled Nutmeg (Without Shell)", price: 240, unit: "200g", tag: "Premium Kernels", cat: "Spices", img: "pics/products/nutmeg-without-shell-1.jpg", desc: "Premium shelled nutmeg seeds (Jathikka Parippu), graded and dried." }
     ];
 
     for (const p of seedList) {
@@ -406,13 +417,14 @@ app.get('/api/products', async (req, res) => {
             SELECT * FROM products 
             ORDER BY 
                 (CASE WHEN stock > 0 THEN 0 ELSE 1 END) ASC,
-                (CASE cat 
-                    WHEN 'Cashew' THEN 1 
-                    WHEN 'Dry Fruits' THEN 2 
-                    WHEN 'Oats & Millets' THEN 3 
-                    WHEN 'Snacks & Breakfast' THEN 4 
-                    WHEN 'Spices' THEN 5 
-                    ELSE 6 
+                (CASE 
+                    WHEN cat = 'Spices' THEN 1
+                    WHEN discount_percent > 0 THEN 2
+                    WHEN cat = 'Cashew' THEN 3
+                    WHEN cat = 'Dry Fruits' THEN 4
+                    WHEN cat = 'Oats & Millets' THEN 5
+                    WHEN cat = 'Snacks & Breakfast' THEN 6
+                    ELSE 7
                 END) ASC,
                 id ASC
         `);

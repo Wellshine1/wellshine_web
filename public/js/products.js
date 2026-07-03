@@ -89,7 +89,10 @@ function renderCatalog(searchQuery = "") {
                     `}
                     <span class="unit-label">/ ${item.unit}</span>
                 </p>
-                <button type="button" class="view-btn-primary">View Specifications</button>
+                <p class="prod-desc-preview" style="font-size: 0.75rem; color: var(--body-text-muted); margin: 6px 0 12px 0; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; height: 32px; line-height: 1.3; text-align: center;">
+                    ${item.description || 'Premium select wholesale item.'}
+                </p>
+                <button type="button" class="view-btn-primary">About Product</button>
             </div>
         `;
     }).join('');
@@ -186,7 +189,7 @@ window.openQuickView = function(id) {
                         </div>
                         
                         <div class="qv-desc">
-                            <h4>Product Specifications:</h4>
+                            <h4>About this Product:</h4>
                             <p>${item.description || 'Premium select wholesale item, sourced from traditional agricultural hubs.'}</p>
                         </div>
                     </div>
