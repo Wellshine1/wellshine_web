@@ -284,12 +284,24 @@ section {
     margin-top: 35px;
     backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);
+    transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), border-color 0.4s ease, box-shadow 0.4s ease;
+}
+
+.govt-badge:hover {
+    transform: translateY(-3px) scale(1.01);
+    border-color: rgba(212, 175, 55, 0.5);
+    box-shadow: 0 10px 20px rgba(212, 175, 55, 0.1);
 }
 
 .badge-icon {
     font-size: 2.2rem;
     color: var(--gold);
     text-shadow: 0 0 15px rgba(212, 175, 55, 0.3);
+    transition: transform 0.5s ease;
+}
+
+.govt-badge:hover .badge-icon {
+    transform: scale(1.1) rotate(-10deg);
 }
 
 .badge-text h4 {
@@ -320,14 +332,14 @@ section {
     border: 1px solid var(--border-color);
     border-radius: 20px;
     padding: 25px;
-    transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+    transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), border-color 0.4s ease, box-shadow 0.4s ease;
     box-shadow: var(--card-shadow);
 }
 
 .legacy-pillar-card:hover {
-    transform: translateX(10px);
+    transform: translateY(-5px) scale(1.02);
     border-color: var(--gold);
-    box-shadow: 0 10px 20px rgba(212, 175, 55, 0.08);
+    box-shadow: 0 15px 30px rgba(212, 175, 55, 0.12);
 }
 
 .pillar-icon {
@@ -341,12 +353,12 @@ section {
     display: flex;
     justify-content: center;
     align-items: center;
-    transition: all 0.4s ease;
+    transition: transform 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275), background-color 0.4s ease, border-color 0.4s ease, box-shadow 0.4s ease;
 }
 
 .legacy-pillar-card:hover .pillar-icon {
-    transform: rotateY(180deg);
-    background: rgba(212, 175, 55, 0.1);
+    transform: scale(1.1) rotate(15deg);
+    background: rgba(212, 175, 55, 0.15);
     border-color: rgba(212, 175, 55, 0.2);
 }
 
@@ -742,14 +754,13 @@ section {
     padding: 30px;
     text-decoration: none;
     text-align: left;
-    transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
-    box-shadow: var(--card-shadow);
+    transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), border-color 0.4s ease, box-shadow 0.4s ease;
 }
 
 .contact-card:hover {
-    transform: translateY(-5px);
+    transform: translateY(-8px) scale(1.02);
     border-color: var(--gold);
-    box-shadow: 0 15px 30px rgba(212, 175, 55, 0.1);
+    box-shadow: 0 15px 35px rgba(212, 175, 55, 0.12);
 }
 
 .contact-card-icon {
@@ -763,6 +774,11 @@ section {
     border: 1px solid rgba(255, 255, 255, 0.08);
     font-size: 2.2rem;
     transition: all 0.4s ease;
+}
+
+.contact-card-icon i {
+    display: inline-block;
+    transition: transform 0.4s ease;
 }
 
 .whatsapp-card .contact-card-icon {
@@ -799,6 +815,42 @@ section {
     border-color: rgba(212, 175, 55, 0.3);
 }
 
+/* Icon micro-animations triggered on card hover */
+@keyframes iconWiggle {
+    0%, 100% { transform: rotate(0); }
+    20% { transform: rotate(-12deg); }
+    40% { transform: rotate(10deg); }
+    60% { transform: rotate(-8deg); }
+    80% { transform: rotate(6deg); }
+}
+
+@keyframes iconRing {
+    0%, 100% { transform: rotate(0) scale(1); }
+    15% { transform: rotate(-20deg) scale(1.1); }
+    30% { transform: rotate(20deg) scale(1.1); }
+    45% { transform: rotate(-15deg) scale(1.1); }
+    60% { transform: rotate(15deg) scale(1.1); }
+    75% { transform: rotate(-10deg) scale(1.1); }
+    90% { transform: rotate(10deg) scale(1.1); }
+}
+
+@keyframes iconBounce {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-8px); }
+}
+
+.whatsapp-card:hover .contact-card-icon i {
+    animation: iconWiggle 0.6s ease-in-out;
+}
+
+.phone-card:hover .contact-card-icon i {
+    animation: iconRing 0.8s ease-in-out;
+}
+
+.email-card:hover .contact-card-icon i {
+    animation: iconBounce 0.6s ease-in-out;
+}
+
 .contact-card-info h3 {
     font-size: 1.3rem;
     font-weight: 800;
@@ -828,8 +880,16 @@ section {
     transition: gap 0.3s ease;
 }
 
+.contact-cta i {
+    transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
 .contact-card:hover .contact-cta {
     gap: 12px;
+}
+
+.contact-card:hover .contact-cta i {
+    transform: translateX(4px);
 }
 
 /* --- FOOTER AREA --- */
