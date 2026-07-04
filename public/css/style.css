@@ -4,8 +4,8 @@
     --brand: #9b1b1b; 
     --gold: #d4af37; 
     --dark-bg: #0a0a0a;
-    --card-bg: rgba(255, 255, 255, 0.03);
-    --border-color: rgba(255, 255, 255, 0.08);
+    --card-bg: rgba(12, 12, 12, 0.75);
+    --border-color: rgba(255, 255, 255, 0.15);
     --body-bg: #000;
     --body-text: #fff;
     --body-text-muted: rgba(255, 255, 255, 0.65);
@@ -277,13 +277,13 @@ section {
     display: flex;
     align-items: center;
     gap: 20px;
-    background: rgba(212, 175, 55, 0.05);
-    border: 1px solid rgba(212, 175, 55, 0.2);
+    background: rgba(12, 12, 12, 0.8);
+    border: 1px solid rgba(212, 175, 55, 0.3);
     border-radius: 20px;
     padding: 20px 24px;
     margin-top: 35px;
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
     transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), border-color 0.4s ease, box-shadow 0.4s ease;
 }
 
@@ -332,6 +332,8 @@ section {
     border: 1px solid var(--border-color);
     border-radius: 20px;
     padding: 25px;
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
     transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), border-color 0.4s ease, box-shadow 0.4s ease;
     box-shadow: var(--card-shadow);
 }
@@ -447,6 +449,8 @@ section {
     border: 1px solid var(--border-color);
     border-radius: 28px;
     padding: 45px;
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
     text-align: left;
     transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
     box-shadow: var(--card-shadow);
@@ -752,6 +756,8 @@ section {
     border: 1px solid var(--border-color);
     border-radius: 24px;
     padding: 30px;
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
     text-decoration: none;
     text-align: left;
     transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), border-color 0.4s ease, box-shadow 0.4s ease;
