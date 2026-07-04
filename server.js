@@ -19,6 +19,14 @@ const PORT = process.env.PORT || 3000;
 app.use(cors());
 app.use(express.json());
 
+// Redirect direct requests for index.html to the root path /
+app.use((req, res, next) => {
+    if (req.path === '/index.html') {
+        return res.redirect(301, '/');
+    }
+    next();
+});
+
 // Serve static files from the project directory
 app.use(express.static(path.join(__dirname, 'public')));
 
