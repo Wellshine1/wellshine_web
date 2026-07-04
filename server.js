@@ -19,6 +19,15 @@ const PORT = process.env.PORT || 3000;
 app.use(cors());
 app.use(express.json());
 
+// Force HTTPS redirect on production environments (e.g. Render, AWS, Heroku, Nginx, Cloudflare)
+app.use((req, res, next) => {
+    const isSecure = req.secure || req.header('x-forwarded-proto') === 'https';
+    if (!isSecure && req.hostname !== 'localhost' && req.hostname !== '127.0.0.1') {
+        return res.redirect(301, 'https://' + req.hostname + req.url);
+    }
+    next();
+});
+
 // Redirect direct requests for index.html to / and any other .html paths to extensionless versions
 app.use((req, res, next) => {
     if (req.path.endsWith('.html')) {
