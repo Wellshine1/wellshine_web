@@ -4,8 +4,8 @@
     --brand: #9b1b1b; 
     --gold: #d4af37; 
     --dark-bg: #0a0a0a;
-    --card-bg: rgba(12, 12, 12, 0.75);
-    --border-color: rgba(255, 255, 255, 0.15);
+    --card-bg: rgba(255, 255, 255, 0.08);
+    --border-color: rgba(255, 255, 255, 0.12);
     --body-bg: #000;
     --body-text: #fff;
     --body-text-muted: rgba(255, 255, 255, 0.65);
@@ -277,7 +277,7 @@ section {
     display: flex;
     align-items: center;
     gap: 20px;
-    background: rgba(12, 12, 12, 0.8);
+    background: rgba(255, 255, 255, 0.08);
     border: 1px solid rgba(212, 175, 55, 0.3);
     border-radius: 20px;
     padding: 20px 24px;
