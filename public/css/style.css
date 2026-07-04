@@ -370,6 +370,125 @@ section {
     text-align: left;
 }
 
+/* --- OUR SERVICES SECTION --- */
+#services {
+    padding: 100px 10%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.services-grid {
+    display: grid;
+    grid-template-columns: 1.1fr 0.9fr;
+    gap: 80px;
+    align-items: center;
+    max-width: 1200px;
+    width: 100%;
+}
+
+.services-content {
+    text-align: left;
+}
+
+.services-tag {
+    display: inline-block;
+    color: var(--gold);
+    font-size: 0.85rem;
+    font-weight: 800;
+    letter-spacing: 2px;
+    margin-bottom: 12px;
+    position: relative;
+    padding-left: 30px;
+}
+
+.services-tag::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 20px;
+    height: 2px;
+    background: var(--gold);
+}
+
+.services-heading {
+    text-align: left;
+    margin-top: 0;
+    margin-bottom: 20px;
+    font-size: clamp(2rem, 4vw, 2.8rem);
+    font-weight: 800;
+    color: #fff;
+}
+
+.services-intro {
+    font-size: 1.05rem;
+    line-height: 1.7;
+    color: var(--body-text-muted);
+    margin-bottom: 35px;
+}
+
+.service-block {
+    display: flex;
+    align-items: flex-start;
+    gap: 20px;
+    margin-bottom: 30px;
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 20px;
+    padding: 24px;
+    transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+    box-shadow: var(--card-shadow);
+}
+
+.service-block:hover {
+    transform: translateY(-4px);
+    border-color: var(--gold);
+    box-shadow: 0 10px 20px rgba(212, 175, 55, 0.08);
+}
+
+.service-block-icon {
+    font-size: 1.5rem;
+    color: var(--gold);
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: 12px;
+    width: 48px;
+    height: 48px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-shrink: 0;
+    transition: all 0.4s ease;
+}
+
+.service-block:hover .service-block-icon {
+    background: rgba(212, 175, 55, 0.1);
+    border-color: rgba(212, 175, 55, 0.2);
+    transform: scale(1.05);
+}
+
+.service-block-info h3 {
+    font-size: 1.15rem;
+    font-weight: 800;
+    color: #fff;
+    margin-bottom: 6px;
+    text-align: left;
+    transition: color 0.3s ease;
+}
+
+.service-block:hover h3 {
+    color: var(--gold);
+}
+
+.service-block-info p {
+    font-size: 0.9rem;
+    color: var(--body-text-muted);
+    line-height: 1.55;
+    text-align: left;
+}
+
 /* --- WHY CHOOSE US SECTION --- */
 #why-choose-us {
     padding: 100px 10%;
@@ -1357,6 +1476,53 @@ footer {
         margin-top: 10px;
     }
     .pillar-info p {
+        text-align: center;
+    }
+}
+
+/* Media Queries for responsive services section */
+@media (max-width: 992px) {
+    #services {
+        padding: 80px 5%;
+    }
+    .services-grid {
+        grid-template-columns: 1fr;
+        gap: 50px;
+    }
+    .services-heading {
+        text-align: center;
+    }
+    .services-tag {
+        display: block;
+        text-align: center;
+        padding-left: 0;
+    }
+    .services-tag::before {
+        display: none;
+    }
+    .services-content {
+        text-align: center;
+    }
+    .service-block-info h3 {
+        text-align: left;
+    }
+    .service-block-info p {
+        text-align: left;
+    }
+}
+
+@media (max-width: 576px) {
+    .service-block {
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        padding: 20px;
+    }
+    .service-block-info h3 {
+        text-align: center;
+        margin-top: 10px;
+    }
+    .service-block-info p {
         text-align: center;
     }
 }
