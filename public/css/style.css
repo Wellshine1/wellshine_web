@@ -1291,19 +1291,49 @@ footer {
 
 /* --- FEATURED BESTSELLERS CAROUSEL --- */
 .carousel-section {
-    min-height: auto !important;
-    padding: 80px 10% !important;
+    padding: 100px 10% !important;
     display: flex;
     flex-direction: column;
     align-items: center;
     background: transparent;
+    text-align: center;
+}
+
+.carousel-tag {
+    display: inline-block;
+    color: var(--gold);
+    font-size: 0.85rem;
+    font-weight: 800;
+    letter-spacing: 2px;
+    margin-bottom: 12px;
+    position: relative;
+    padding-left: 30px;
+}
+
+.carousel-tag::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 20px;
+    height: 2px;
+    background: var(--gold);
+}
+
+.carousel-intro {
+    font-size: 1.05rem;
+    line-height: 1.7;
+    color: var(--body-text-muted);
+    max-width: 600px;
+    margin: -10px auto 40px;
 }
 
 .carousel-container {
     position: relative;
     width: 100%;
-    max-width: 900px;
-    margin: 40px auto 20px;
+    max-width: 1200px;
+    margin: 0 auto;
     display: flex;
     align-items: center;
 }
@@ -1311,124 +1341,156 @@ footer {
 .carousel-track-wrapper {
     width: 100%;
     overflow: hidden;
-    border-radius: 30px;
-    border: 1px solid var(--border-color);
-    box-shadow: var(--card-shadow);
 }
 
 .carousel-track {
     display: flex;
-    transition: transform 0.6s cubic-bezier(0.165, 0.84, 0.44, 1);
+    gap: 30px;
     width: 100%;
+    padding: 15px 5px;
+    overflow-x: auto;
+    scroll-behavior: smooth;
+    scroll-snap-type: x mandatory;
+    scrollbar-width: none; /* Hide scrollbar for Firefox */
 }
 
-.carousel-slide {
-    min-width: 100%;
+.carousel-track::-webkit-scrollbar {
+    display: none; /* Hide scrollbar for Chrome/Safari */
+}
+
+/* Card Styling */
+.bestseller-card {
+    min-width: calc((100% - 60px) / 3); /* Show 3 cards on desktop */
+    max-width: calc((100% - 60px) / 3);
     box-sizing: border-box;
-    opacity: 0.1;
-    transition: opacity 0.6s ease;
+    scroll-snap-align: start;
     background: var(--card-bg);
-    backdrop-filter: blur(15px);
-    -webkit-backdrop-filter: blur(15px);
+    border: 1px solid var(--border-color);
+    border-radius: 24px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+    box-shadow: var(--card-shadow);
+    position: relative;
 }
 
-.carousel-slide.active {
-    opacity: 1;
+.bestseller-card:hover {
+    transform: translateY(-8px);
+    border-color: var(--gold);
+    box-shadow: 0 15px 30px rgba(212, 175, 55, 0.1);
 }
 
-.slide-grid {
-    display: grid;
-    grid-template-columns: 1fr 1.2fr;
-    align-items: center;
+.product-badge {
+    position: absolute;
+    top: 15px;
+    left: 15px;
+    background: rgba(212, 175, 55, 0.9);
+    color: #000;
+    font-size: 0.72rem;
+    font-weight: 800;
+    padding: 6px 12px;
+    border-radius: 12px;
+    z-index: 10;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
 }
 
-.slide-img-side {
-    height: 380px;
+.product-img-box {
+    width: 100%;
+    height: 240px;
     overflow: hidden;
     background: #0f0f0f;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    position: relative;
 }
 
-.slide-img-side img {
+.product-img-box img {
     width: 100%;
     height: 100%;
     object-fit: cover;
-    transition: 0.5s;
+    transition: transform 0.6s ease;
 }
 
-.carousel-slide:hover .slide-img-side img {
-    transform: scale(1.04);
+.bestseller-card:hover .product-img-box img {
+    transform: scale(1.06);
 }
 
-.slide-info-side {
-    padding: 40px 50px;
-    text-align: left;
+.product-details {
+    padding: 25px;
     display: flex;
     flex-direction: column;
-    justify-content: center;
+    flex-grow: 1;
+    text-align: left;
 }
 
-.slide-tag {
-    color: var(--gold);
-    font-size: 0.7rem;
+.product-details h3 {
+    font-size: 1.25rem;
     font-weight: 800;
-    text-transform: uppercase;
-    letter-spacing: 2px;
-    margin-bottom: 10px;
-    display: inline-block;
+    color: #fff;
+    margin-bottom: 8px;
 }
 
-.slide-title {
-    font-size: 1.6rem;
-    font-weight: 800;
-    color: var(--body-text);
-    margin-bottom: 15px;
-    line-height: 1.3;
-}
-
-.slide-desc {
-    font-size: 0.95rem;
-    line-height: 1.6;
+.product-desc {
+    font-size: 0.88rem;
     color: var(--body-text-muted);
-    margin-bottom: 25px;
+    line-height: 1.5;
+    margin-bottom: 20px;
+    flex-grow: 1;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
 }
 
-.slide-price {
-    font-size: 1.6rem;
+.product-price-row {
+    margin-bottom: 20px;
+    font-size: 1.3rem;
     font-weight: 800;
-    color: var(--body-text);
-    margin-bottom: 25px;
+    color: var(--gold);
+    display: flex;
+    align-items: baseline;
+    gap: 5px;
 }
 
-.slide-btn {
+.price-slashed {
+    text-decoration: line-through;
+    opacity: 0.5;
+    font-size: 0.95rem;
+    margin-right: 5px;
+}
+
+.product-unit {
+    font-size: 0.85rem;
+    font-weight: normal;
+    color: var(--body-text-muted);
+}
+
+.product-action-btn {
+    width: 100%;
     background: var(--brand);
     color: #fff;
     border: none;
-    padding: 12px 30px;
+    padding: 12px;
     border-radius: 12px;
     font-weight: 700;
     cursor: pointer;
     font-size: 0.85rem;
     text-transform: uppercase;
-    letter-spacing: 1px;
-    transition: 0.3s;
-    align-self: flex-start;
+    letter-spacing: 0.5px;
+    transition: all 0.3s ease;
 }
 
-.slide-btn:hover {
+.product-action-btn:hover {
     background: #c22929;
     box-shadow: 0 5px 15px rgba(155, 27, 27, 0.4);
     transform: translateY(-2px);
 }
 
-/* Light theme button adjustments */
-:root.light-theme .slide-btn {
+:root.light-theme .product-action-btn {
     background: var(--brand);
-    color: #fff;
 }
-:root.light-theme .slide-btn:hover {
+
+:root.light-theme .product-action-btn:hover {
     background: #0c381c;
     box-shadow: 0 5px 15px rgba(18, 78, 39, 0.3);
 }
@@ -1445,16 +1507,19 @@ footer {
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 1.2rem;
+    font-size: 1rem;
     z-index: 100;
-    transition: 0.3s;
+    transition: all 0.3s ease;
     position: absolute;
+    backdrop-filter: blur(5px);
+    -webkit-backdrop-filter: blur(5px);
 }
 
 .carousel-arrow:hover {
     background: var(--gold);
     color: #000;
     box-shadow: 0 0 15px rgba(212, 175, 55, 0.4);
+    border-color: var(--gold);
 }
 
 .prev-arrow {
@@ -1465,69 +1530,35 @@ footer {
     right: -70px;
 }
 
-/* Dots */
-.carousel-dots {
-    display: flex;
-    gap: 10px;
-    margin-top: 20px;
-}
-
-.dot {
-    width: 10px;
-    height: 10px;
-    border-radius: 50%;
-    background: rgba(255, 255, 255, 0.2);
-    cursor: pointer;
-    transition: 0.3s;
-}
-
-.dot.active {
-    background: var(--gold);
-    width: 25px;
-    border-radius: 10px;
-}
-
 /* Responsive adjustments */
 @media (max-width: 1024px) {
     .carousel-container {
         max-width: 92%;
     }
-    .prev-arrow { left: -20px; background: rgba(0,0,0,0.6); }
-    .next-arrow { right: -20px; background: rgba(0,0,0,0.6); }
+    .prev-arrow { left: -20px; }
+    .next-arrow { right: -20px; }
 }
 
-@media (max-width: 768px) {
+@media (max-width: 992px) {
     .carousel-section {
-        padding: 50px 5% !important;
+        padding: 80px 5% !important;
     }
-    .slide-grid {
-        grid-template-columns: 1fr;
+    .bestseller-card {
+        min-width: calc((100% - 30px) / 2);
+        max-width: calc((100% - 30px) / 2);
     }
-    .slide-img-side {
-        height: 220px;
+}
+
+@media (max-width: 576px) {
+    .carousel-track {
+        gap: 20px;
     }
-    .slide-info-side {
-        padding: 30px 20px;
-        text-align: center;
-        align-items: center;
-    }
-    .slide-btn {
-        align-self: center;
-    }
-    .slide-title {
-        font-size: 1.3rem;
-    }
-    .slide-desc {
-        font-size: 0.85rem;
-    }
-    .slide-price {
-        font-size: 1.3rem;
-        margin-bottom: 20px;
+    .bestseller-card {
+        min-width: 100%;
+        max-width: 100%;
     }
     .carousel-arrow {
-        width: 40px;
-        height: 40px;
-        font-size: 1rem;
+        display: none;
     }
 }
 

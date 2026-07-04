@@ -6,7 +6,7 @@
     <title>Wellshine Distributors | Official Hub</title>
     <meta name="description" content="Official wholesale distributor of CDC Cashews (Govt. of Kerala), premium dry fruits, millets, spices, and snacks in Pala, Kerala. Wellshine Distributors.">
     <meta name="keywords" content="CDC Cashews, Wellshine, Distributors, Pala, Kerala, Wholesale, Cashews, Dry Fruits, Oats, Millets, Spices, Food Distribution">
-    <link rel="stylesheet" href="css/style.css?v=2.7">
+    <link rel="stylesheet" href="css/style.css?v=2.8">
     <link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- Early theme check to prevent flash -->
@@ -138,25 +138,22 @@
 
     <!-- FEATURED CAROUSEL SECTION -->
     <section id="featured-carousel" class="carousel-section">
-        <h2 class="section-heading" data-aos="fade-up">Bestsellers</h2>
+        <span class="carousel-tag">POPULAR CHOICES</span>
+        <h2 class="section-heading" data-aos="fade-up">Our Bestsellers</h2>
+        <p class="carousel-intro" data-aos="fade-up">Handpicked customer favorites, sourced directly for supreme quality and grade.</p>
         
         <div class="carousel-container" data-aos="zoom-in" data-aos-duration="1200">
             <!-- Left Arrow -->
-            <button class="carousel-arrow prev-arrow" onclick="moveSlide(-1)">&lt;</button>
+            <button class="carousel-arrow prev-arrow" onclick="moveSlide(-1)"><i class="fas fa-chevron-left"></i></button>
             
             <div class="carousel-track-wrapper">
                 <div class="carousel-track" id="carousel-track">
-                    <!-- Populated dynamically -->
+                    <!-- Populated dynamically with product cards -->
                 </div>
             </div>
             
             <!-- Right Arrow -->
-            <button class="carousel-arrow next-arrow" onclick="moveSlide(1)">&gt;</button>
-        </div>
-        
-        <!-- Navigation Dots -->
-        <div class="carousel-dots" id="carousel-dots">
-            <!-- Populated dynamically -->
+            <button class="carousel-arrow next-arrow" onclick="moveSlide(1)"><i class="fas fa-chevron-right"></i></button>
         </div>
     </section>
 
@@ -422,60 +419,15 @@
     <!-- JS script to handle Bestsellers Carousel, Dropdown menu, and Theme Switcher -->
     <script>
         // --- FEATURED BESTSELLERS CAROUSEL ENGINE ---
-        let currentSlide = 0;
-        let slideInterval;
-        let slides, dots, track;
-
-        function initCarousel() {
-            slides = document.querySelectorAll('.carousel-slide');
-            dots = document.querySelectorAll('.dot');
-            track = document.getElementById('carousel-track');
-            
-            showSlide(0);
-            startAutoCycle();
-        }
-
-        function showSlide(index) {
-            if (!slides || slides.length === 0) return;
-            
-            // Boundary checks
-            if (index >= slides.length) currentSlide = 0;
-            else if (index < 0) currentSlide = slides.length - 1;
-            else currentSlide = index;
-
-            // Shift slide track
-            if (track) {
-                track.style.transform = `translateX(-${currentSlide * 100}%)`;
-            }
-
-            // Update active states
-            slides.forEach((slide, idx) => {
-                if (idx === currentSlide) slide.classList.add('active');
-                else slide.classList.remove('active');
-            });
-
-            dots.forEach((dot, idx) => {
-                if (idx === currentSlide) dot.classList.add('active');
-                else dot.classList.remove('active');
-            });
-        }
-
-        function moveSlide(step) {
-            clearInterval(slideInterval);
-            showSlide(currentSlide + step);
-            startAutoCycle();
-        }
-
-        function setSlide(index) {
-            clearInterval(slideInterval);
-            showSlide(index);
-            startAutoCycle();
-        }
-
-        function startAutoCycle() {
-            slideInterval = setInterval(() => {
-                showSlide(currentSlide + 1);
-            }, 5000);
+        // --- FEATURED BESTSELLERS CAROUSEL ENGINE ---
+        function moveSlide(direction) {
+            const track = document.getElementById('carousel-track');
+            if (!track) return;
+            const firstCard = track.firstElementChild;
+            if (!firstCard) return;
+            const cardWidth = firstCard.getBoundingClientRect().width;
+            const gap = 30; // Gap between cards
+            track.scrollBy({ left: direction * (cardWidth + gap), behavior: 'smooth' });
         }
 
         async function loadBestsellers() {
@@ -493,10 +445,9 @@
                 }
                 
                 const track = document.getElementById('carousel-track');
-                const dotsContainer = document.getElementById('carousel-dots');
-                if (!track || !dotsContainer) return;
+                if (!track) return;
                 
-                track.innerHTML = bestsellers.map((item, index) => {
+                track.innerHTML = bestsellers.map((item) => {
                     const hasDiscount = item.discount_percent > 0;
                     const triggerQty = parseInt(item.discount_trigger_qty) || 1;
                     const isDiscountUnlocked = hasDiscount && triggerQty === 1;
@@ -504,36 +455,29 @@
                     
                     let priceHTML = '';
                     if (isDiscountUnlocked) {
-                        priceHTML = `<span class="price-original-slashed" style="text-decoration: line-through; opacity: 0.5; margin-right: 8px;">₹${item.price}</span> ₹${finalPrice}`;
+                        priceHTML = `<span class="price-slashed">₹${item.price}</span> ₹${finalPrice}`;
                     } else {
                         priceHTML = `₹${item.price}`;
                     }
                     
                     return `
-                        <div class="carousel-slide ${index === 0 ? 'active' : ''}">
-                            <div class="slide-grid">
-                                <div class="slide-img-side">
-                                    <img src="${item.img}" alt="${item.name}" onerror="this.src='pics/products/croast.jpg'">
+                        <div class="product-card bestseller-card">
+                            <div class="product-badge">${item.tag || 'Bestseller'}</div>
+                            <div class="product-img-box">
+                                <img src="${item.img}" alt="${item.name}" onerror="this.src='pics/products/croast.jpg'">
+                            </div>
+                            <div class="product-details">
+                                <h3>${item.name}</h3>
+                                <p class="product-desc">${item.description || 'Premium select wholesale item, sourced from traditional agricultural hubs.'}</p>
+                                <div class="product-price-row">
+                                    <span class="product-price">${priceHTML}</span>
+                                    <span class="product-unit">/ ${item.unit}</span>
                                 </div>
-                                <div class="slide-info-side">
-                                    <span class="slide-tag">${item.tag || 'Bestseller'}</span>
-                                    <h3 class="slide-title">${item.name}</h3>
-                                    <p class="slide-desc">${item.description || 'Premium select wholesale item, sourced from traditional agricultural hubs.'}</p>
-                                    <p class="slide-price" style="font-size: 1.4rem; font-weight: 700; color: var(--gold); margin: 10px 0;">
-                                        ${priceHTML} <span class="unit-label" style="font-size: 0.9rem; font-weight: normal; color: #ccc;">/ ${item.unit}</span>
-                                    </p>
-                                    <button class="slide-btn" onclick="location.href='products.html'">View in Showcase</button>
-                                </div>
+                                <button class="product-action-btn" onclick="location.href='products.html'">View in Showcase</button>
                             </div>
                         </div>
                     `;
                 }).join('');
-                
-                dotsContainer.innerHTML = bestsellers.map((_, index) => `
-                    <span class="dot ${index === 0 ? 'active' : ''}" onclick="setSlide(${index})"></span>
-                `).join('');
-                
-                initCarousel();
             } catch (err) {
                 console.error("Error loading bestsellers:", err);
             }
