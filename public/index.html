@@ -419,7 +419,8 @@
     <!-- JS script to handle Bestsellers Carousel, Dropdown menu, and Theme Switcher -->
     <script>
         // --- FEATURED BESTSELLERS CAROUSEL ENGINE ---
-        // --- FEATURED BESTSELLERS CAROUSEL ENGINE ---
+        let carouselInterval;
+        
         function moveSlide(direction) {
             const track = document.getElementById('carousel-track');
             if (!track) return;
@@ -428,59 +429,131 @@
             const cardWidth = firstCard.getBoundingClientRect().width;
             const gap = 30; // Gap between cards
             track.scrollBy({ left: direction * (cardWidth + gap), behavior: 'smooth' });
+            
+            // Reset autoplay timer on user interaction
+            startCarouselAutoPlay();
         }
 
-        async function loadBestsellers() {
-            try {
-                const response = await fetch('/api/products');
-                if (!response.ok) return;
-                const products = await response.json();
-                
-                // Filter bestsellers
-                let bestsellers = products.filter(p => parseInt(p.is_bestseller) === 1);
-                
-                // Fallback: if no products are marked, display first 4
-                if (bestsellers.length === 0) {
-                    bestsellers = products.slice(0, 4);
-                }
-                
+        function startCarouselAutoPlay() {
+            stopCarouselAutoPlay(); // Prevent duplicate intervals
+            carouselInterval = setInterval(() => {
                 const track = document.getElementById('carousel-track');
                 if (!track) return;
                 
-                track.innerHTML = bestsellers.map((item) => {
-                    const hasDiscount = item.discount_percent > 0;
-                    const triggerQty = parseInt(item.discount_trigger_qty) || 1;
-                    const isDiscountUnlocked = hasDiscount && triggerQty === 1;
-                    const finalPrice = hasDiscount ? Math.round(item.price * (1 - item.discount_percent / 100)) : item.price;
-                    
-                    let priceHTML = '';
-                    if (isDiscountUnlocked) {
-                        priceHTML = `<span class="price-slashed">₹${item.price}</span> ₹${finalPrice}`;
-                    } else {
-                        priceHTML = `₹${item.price}`;
-                    }
-                    
-                    return `
-                        <div class="product-card bestseller-card">
-                            <div class="product-badge">${item.tag || 'Bestseller'}</div>
-                            <div class="product-img-box">
-                                <img src="${item.img}" alt="${item.name}" onerror="this.src='pics/products/croast.jpg'">
-                            </div>
-                            <div class="product-details">
-                                <h3>${item.name}</h3>
-                                <p class="product-desc">${item.description || 'Premium select wholesale item, sourced from traditional agricultural hubs.'}</p>
-                                <div class="product-price-row">
-                                    <span class="product-price">${priceHTML}</span>
-                                    <span class="product-unit">/ ${item.unit}</span>
-                                </div>
-                                <button class="product-action-btn" onclick="location.href='products.html'">View in Showcase</button>
-                            </div>
-                        </div>
-                    `;
-                }).join('');
-            } catch (err) {
-                console.error("Error loading bestsellers:", err);
+                const firstCard = track.firstElementChild;
+                if (!firstCard) return;
+                const cardWidth = firstCard.getBoundingClientRect().width;
+                const gap = 30;
+                
+                // If reached the end of the scroll, slide back to start
+                if (Math.ceil(track.scrollLeft + track.clientWidth) >= track.scrollWidth - 10) {
+                    track.scrollTo({ left: 0, behavior: 'smooth' });
+                } else {
+                    track.scrollBy({ left: cardWidth + gap, behavior: 'smooth' });
+                }
+            }, 4000);
+        }
+
+        function stopCarouselAutoPlay() {
+            if (carouselInterval) {
+                clearInterval(carouselInterval);
             }
+        }
+
+        async function loadBestsellers() {
+            let bestsellers = [];
+            try {
+                const response = await fetch('/api/products');
+                if (response.ok) {
+                    const products = await response.json();
+                    bestsellers = products.filter(p => parseInt(p.is_bestseller) === 1);
+                    if (bestsellers.length === 0) {
+                        bestsellers = products.slice(0, 4);
+                    }
+                }
+            } catch (err) {
+                console.warn("Could not fetch products from server, using local fallbacks:", err);
+            }
+            
+            // Resilience: If database fetch fails, show beautiful default items
+            if (!bestsellers || bestsellers.length === 0) {
+                bestsellers = [
+                    {
+                        name: "CDC Cashews (W180)",
+                        tag: "Govt. Source",
+                        img: "pics/products/w320_500g.jpg",
+                        description: "Authorized wholesale distributor of CDC Cashews (Govt. of Kerala). Premium, jumbo-sized whole cashew kernels.",
+                        price: 900,
+                        unit: "1 Kg"
+                    },
+                    {
+                        name: "Premium Almonds (Badam)",
+                        tag: "Imported Select",
+                        img: "pics/products/badam.jpg",
+                        description: "Nutrient-rich, crunchiest select California almonds. Perfect for daily snacking and retail packing.",
+                        price: 850,
+                        unit: "1 Kg"
+                    },
+                    {
+                        name: "Green Cardamom (8mm Bold)",
+                        tag: "Spices Hub",
+                        img: "pics/products/cardamom.jpg",
+                        description: "Extra bold green cardamom capsules sourced from clean estates in Idukki. High essential oil content.",
+                        price: 2400,
+                        unit: "1 Kg"
+                    },
+                    {
+                        name: "Whole Black Pepper",
+                        tag: "Malabar Bold",
+                        img: "pics/products/black-pepper.jpg",
+                        description: "Naturally sun-dried Malabar black pepper. Strong aroma and hot, biting taste.",
+                        price: 720,
+                        unit: "1 Kg"
+                    }
+                ];
+            }
+
+            const track = document.getElementById('carousel-track');
+            if (!track) return;
+            
+            track.innerHTML = bestsellers.map((item) => {
+                const hasDiscount = item.discount_percent > 0;
+                const triggerQty = parseInt(item.discount_trigger_qty) || 1;
+                const isDiscountUnlocked = hasDiscount && triggerQty === 1;
+                const finalPrice = hasDiscount ? Math.round(item.price * (1 - item.discount_percent / 100)) : item.price;
+                
+                let priceHTML = '';
+                if (isDiscountUnlocked) {
+                    priceHTML = `<span class="price-slashed">₹${item.price}</span> ₹${finalPrice}`;
+                } else {
+                    priceHTML = `₹${item.price}`;
+                }
+                
+                return `
+                    <div class="product-card bestseller-card">
+                        <div class="product-badge">${item.tag || 'Bestseller'}</div>
+                        <div class="product-img-box">
+                            <img src="${item.img}" alt="${item.name}" onerror="this.src='pics/products/croast.jpg'">
+                        </div>
+                        <div class="product-details">
+                            <h3>${item.name}</h3>
+                            <p class="product-desc">${item.description || 'Premium select wholesale item, sourced from traditional agricultural hubs.'}</p>
+                            <div class="product-price-row">
+                                <span class="product-price">${priceHTML}</span>
+                                <span class="product-unit">/ ${item.unit}</span>
+                            </div>
+                            <button class="product-action-btn" onclick="location.href='products.html'">View in Showcase</button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+            
+            // Start the automatic rotation cycle
+            startCarouselAutoPlay();
+            
+            // Pause autoplay when cursor hovers, resume on leave
+            track.addEventListener('mouseenter', stopCarouselAutoPlay);
+            track.addEventListener('mouseleave', startCarouselAutoPlay);
         }
 
         // --- THEME ENGINE ---
