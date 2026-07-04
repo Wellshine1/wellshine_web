@@ -167,6 +167,14 @@ section {
     overflow: hidden;
 }
 
+.hero-center-logo {
+    height: clamp(60px, 12vw, 100px);
+    width: auto;
+    object-fit: contain;
+    margin-bottom: 25px;
+    filter: drop-shadow(0 4px 15px rgba(0, 0, 0, 0.5));
+}
+
 .main-title { 
     font-size: clamp(3rem, 8vw, 7.5rem); 
     font-weight: 800; 
