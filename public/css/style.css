@@ -168,7 +168,7 @@ section {
 }
 
 .hero-center-logo {
-    height: clamp(60px, 12vw, 100px);
+    height: clamp(90px, 16vw, 150px);
     width: auto;
     object-fit: contain;
     margin-bottom: 25px;

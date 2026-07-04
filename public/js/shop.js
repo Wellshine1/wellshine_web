@@ -125,7 +125,7 @@ function renderShop(searchQuery = "") {
             <div class="item-card-pro" style="${isOutOfStock ? 'opacity: 0.7;' : ''}">
                 <div class="product-image-container">
                     ${ribbonHTML}
-                    <img src="${item.img}" class="main-prod-img" onerror="this.src='pics/products/croast.jpg'" onclick="openQuickView(${item.id})">
+                    <img src="${item.img}" alt="${item.name} in Pala, Kerala - Wellshine Distributors" class="main-prod-img" onerror="this.src='pics/products/croast.jpg'" onclick="openQuickView(${item.id})">
                     <div class="product-img-overlay" onclick="openQuickView(${item.id})"><i class="fas fa-search-plus"></i> Quick View</div>
                 </div>
                 <div onclick="openQuickView(${item.id})" style="cursor: pointer;">
@@ -419,7 +419,7 @@ window.openQuickView = function(id) {
             <div class="qv-grid">
                 <div class="qv-image-side" style="position: relative;">
                     ${ribbonHTML}
-                    <img src="${item.img}" onerror="this.src='pics/products/croast.jpg'">
+                    <img src="${item.img}" alt="${item.name} in Pala, Kerala - Wellshine Distributors" onerror="this.src='pics/products/croast.jpg'">
                 </div>
                 <div class="qv-details-side">
                     <span class="tag-label" style="font-size: 0.75rem;">${item.tag}</span>

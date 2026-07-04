@@ -75,7 +75,7 @@ function renderCatalog(searchQuery = "") {
             <div class="item-card-pro" onclick="openQuickView(${item.id})">
                 <div class="product-image-container">
                     ${ribbonHTML}
-                    <img src="${item.img}" class="main-prod-img" onerror="this.src='pics/products/croast.jpg'">
+                    <img src="${item.img}" alt="${item.name} in Pala, Kerala - Wellshine Distributors" class="main-prod-img" onerror="this.src='pics/products/croast.jpg'">
                     <div class="product-img-overlay"><i class="fas fa-search-plus"></i> View Details</div>
                 </div>
                 <span class="tag-label">${item.tag}</span>
@@ -165,7 +165,7 @@ window.openQuickView = function(id) {
             <div class="qv-grid">
                 <div class="qv-image-side" style="position: relative;">
                     ${ribbonHTML}
-                    <img src="${item.img}" onerror="this.src='pics/products/croast.jpg'">
+                    <img src="${item.img}" alt="${item.name} in Pala, Kerala - Wellshine Distributors" onerror="this.src='pics/products/croast.jpg'">
                 </div>
                 <div class="qv-details-side">
                     <div>
