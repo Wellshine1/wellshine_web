@@ -71,7 +71,7 @@ body {
     animation: slideAnimation 24s infinite;
 }
 
-.slide:nth-child(1) { background-image: linear-gradient(var(--bg-overlay), var(--bg-overlay)), url('../pics/badam6.jpeg'); animation-delay: 0s; }
+.slide:nth-child(1) { background-image: linear-gradient(var(--bg-overlay), var(--bg-overlay)), url('../pics/mm_optimized.jpg'); animation-delay: 0s; }
 .slide:nth-child(2) { background-image: linear-gradient(var(--bg-overlay), var(--bg-overlay)), url('../pics/cashew-bg.jpg'); animation-delay: 6s; }
 .slide:nth-child(3) { background-image: linear-gradient(var(--bg-overlay), var(--bg-overlay)), url('../pics/dryfruits.jpeg'); animation-delay: 12s; }
 .slide:nth-child(4) { background-image: linear-gradient(var(--bg-overlay), var(--bg-overlay)), url('../pics/spices.jpeg'); animation-delay: 18s; }
