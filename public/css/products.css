@@ -827,7 +827,6 @@ body {
     }
     .item-card-pro {
         padding: 20px;
-        text-align: left;
     }
     .product-image-container {
         height: 180px;
@@ -837,16 +836,13 @@ body {
         font-size: 1.1rem;
         min-height: auto;
         margin: 5px 0 8px;
-        text-align: left;
     }
     .price-text {
         font-size: 1.2rem;
-        text-align: left;
         margin-bottom: 12px;
     }
     .tag-label {
         font-size: 0.65rem;
-        align-self: flex-start;
     }
     .badge-count {
         font-size: 0.7rem;
@@ -933,7 +929,7 @@ body {
         overflow: visible !important;
         height: auto !important;
         -webkit-line-clamp: unset !important;
-        text-align: left !important;
+        text-align: center !important;
     }
 }
 
