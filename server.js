@@ -30,6 +30,11 @@ app.use((req, res, next) => {
 
 // Redirect direct requests for index.html to / and any other .html paths to extensionless versions
 app.use((req, res, next) => {
+    // Exclude Google Site Verification files from redirects
+    if (req.path.startsWith('/google') && req.path.endsWith('.html')) {
+        return next();
+    }
+
     if (req.path.endsWith('.html')) {
         if (req.path === '/index.html') {
             return res.redirect(301, '/');
