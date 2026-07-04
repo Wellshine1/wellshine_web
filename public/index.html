@@ -597,26 +597,31 @@
                 });
             }
 
-            // Scroll hide navigation behavior
-            let lastScrollY = window.scrollY;
-            window.addEventListener('scroll', () => {
-                const nav = document.querySelector('.nav-wrapper');
-                if (!nav) return;
-                const currentScrollY = window.scrollY;
-                if (currentScrollY < 50) {
-                    nav.classList.remove('nav-hidden');
-                    lastScrollY = currentScrollY;
-                    return;
-                }
-                if (Math.abs(currentScrollY - lastScrollY) > 10) {
-                    if (currentScrollY > lastScrollY) {
-                        nav.classList.add('nav-hidden');
-                    } else {
-                        nav.classList.remove('nav-hidden');
+            // Scroll hide navigation behavior (optimized with cached selector and requestAnimationFrame)
+            const nav = document.querySelector('.nav-wrapper');
+            if (nav) {
+                let lastScrollY = window.scrollY;
+                let ticking = false;
+                window.addEventListener('scroll', () => {
+                    if (!ticking) {
+                        window.requestAnimationFrame(() => {
+                            const currentScrollY = window.scrollY;
+                            if (currentScrollY < 50) {
+                                nav.classList.remove('nav-hidden');
+                            } else if (Math.abs(currentScrollY - lastScrollY) > 10) {
+                                if (currentScrollY > lastScrollY) {
+                                    nav.classList.add('nav-hidden');
+                                } else {
+                                    nav.classList.remove('nav-hidden');
+                                }
+                            }
+                            lastScrollY = currentScrollY;
+                            ticking = false;
+                        });
+                        ticking = true;
                     }
-                    lastScrollY = currentScrollY;
-                }
-            });
+                }, { passive: true });
+            }
         });
     </script>
 
