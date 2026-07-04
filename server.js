@@ -19,10 +19,15 @@ const PORT = process.env.PORT || 3000;
 app.use(cors());
 app.use(express.json());
 
-// Redirect direct requests for index.html to the root path /
+// Redirect direct requests for index.html to / and any other .html paths to extensionless versions
 app.use((req, res, next) => {
-    if (req.path === '/index.html') {
-        return res.redirect(301, '/');
+    if (req.path.endsWith('.html')) {
+        if (req.path === '/index.html') {
+            return res.redirect(301, '/');
+        }
+        const cleanPath = req.path.slice(0, -5); // remove '.html'
+        const query = req.url.substring(req.path.length); // preserve query parameters
+        return res.redirect(301, cleanPath + query);
     }
     next();
 });
@@ -1037,6 +1042,19 @@ app.get('/api/admin/users', requireAdmin, async (req, res) => {
         console.error(err);
         res.status(500).json({ error: 'Internal Server Error fetching registered users' });
     }
+});
+
+// Clean URLs - HTML Route Handlers
+app.get('/products', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'products.html'));
+});
+
+app.get('/shop', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'shop.html'));
+});
+
+app.get('/admin', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'admin.html'));
 });
 
 // Fallback index.html for root path

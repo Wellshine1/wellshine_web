@@ -129,7 +129,7 @@ window.openQuickView = function(id) {
             </button>`;
     } else {
         btnHTML = `
-            <button class="shop-redirect-btn" onclick="location.href='shop.html'">
+            <button class="shop-redirect-btn" onclick="location.href='/shop'">
                 <span>ORDER THIS IN PORTAL</span>
                 <i class="fas fa-shopping-basket"></i>
             </button>`;

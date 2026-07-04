@@ -706,8 +706,8 @@ body {
 }
 
 @media (max-width: 768px) {
-    .header-nav a[href="index.html"],
-    .header-nav a[href="products.html"] {
+    .header-nav a[href="/"],
+    .header-nav a[href="/products"] {
         display: none;
     }
     .products-header {
