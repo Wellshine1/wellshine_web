@@ -555,7 +555,7 @@ section {
 
 /* --- DIRECT CONNECT SECTION --- */
 .contact-container {
-    max-width: 900px;
+    max-width: 1100px;
     width: 100%;
     margin: 0 auto;
     text-align: center;
@@ -571,7 +571,7 @@ section {
 
 .contact-cards {
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: 1fr 1fr 1fr;
     gap: 30px;
 }
 
@@ -613,6 +613,11 @@ section {
     text-shadow: 0 0 15px rgba(37, 211, 102, 0.3);
 }
 
+.phone-card .contact-card-icon {
+    color: #3b82f6;
+    text-shadow: 0 0 15px rgba(59, 130, 246, 0.3);
+}
+
 .email-card .contact-card-icon {
     color: var(--gold);
     text-shadow: 0 0 15px rgba(212, 175, 55, 0.3);
@@ -625,6 +630,11 @@ section {
 .whatsapp-card:hover .contact-card-icon {
     background: rgba(37, 211, 102, 0.1);
     border-color: rgba(37, 211, 102, 0.3);
+}
+
+.phone-card:hover .contact-card-icon {
+    background: rgba(59, 130, 246, 0.1);
+    border-color: rgba(59, 130, 246, 0.3);
 }
 
 .email-card:hover .contact-card-icon {
