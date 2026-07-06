@@ -7,6 +7,7 @@ const express = require('express');
 const cors = require('cors');
 const dotenv = require('dotenv');
 const path = require('path');
+const fs = require('fs');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 
@@ -1059,8 +1060,79 @@ app.get('/api/admin/users', requireAdmin, async (req, res) => {
 });
 
 // Clean URLs - HTML Route Handlers
-app.get('/products', (req, res) => {
-    res.sendFile(path.join(__dirname, 'public', 'products.html'));
+app.get('/products', async (req, res) => {
+    try {
+        const filePath = path.join(__dirname, 'public', 'products.html');
+        let html = await fs.promises.readFile(filePath, 'utf8');
+
+        // Fetch products from database
+        const products = await query(`
+            SELECT * FROM products 
+            ORDER BY 
+                (CASE WHEN stock > 0 THEN 0 ELSE 1 END) ASC,
+                (CASE 
+                    WHEN cat = 'Spices' THEN 1
+                    WHEN discount_percent > 0 THEN 2
+                    WHEN cat = 'Cashew' THEN 3
+                    WHEN cat = 'Dry Fruits' THEN 4
+                    WHEN cat = 'Oats & Millets' THEN 5
+                    WHEN cat = 'Snacks & Breakfast' THEN 6
+                    ELSE 7
+                END) ASC,
+                (CASE WHEN id IN (32, 34, 39, 51) THEN 1 ELSE 0 END) ASC,
+                id ASC
+        `);
+
+        // Generate product cards HTML matching the structure in products.js
+        const cardsHtml = products.map(item => {
+            const hasDiscount = item.discount_percent > 0;
+            const finalPrice = hasDiscount ? Math.round(item.price * (1 - item.discount_percent / 100)) : item.price;
+            const triggerQty = parseInt(item.discount_trigger_qty) || 1;
+            const isFlatDiscount = hasDiscount && triggerQty === 1;
+            let ribbonHTML = '';
+            if (hasDiscount) {
+                if (triggerQty > 1) {
+                    ribbonHTML = `<div class="discount-ribbon">Buy ${triggerQty}+: ${item.discount_percent}% OFF</div>`;
+                } else {
+                    ribbonHTML = `<div class="discount-ribbon">${item.discount_percent}% OFF</div>`;
+                }
+            }
+            return `
+                <div class="item-card-pro" onclick="openQuickView(${item.id})">
+                    <div class="product-image-container">
+                        ${ribbonHTML}
+                        <img src="${item.img}" alt="${item.name} in Pala, Kerala - Wellshine Distributors" class="main-prod-img" onerror="this.src='pics/products/croast.jpg'">
+                        <div class="product-img-overlay"><i class="fas fa-search-plus"></i> View Details</div>
+                    </div>
+                    <span class="tag-label">${item.tag}</span>
+                    <h3 class="prod-title">${item.name}</h3>
+                    <p class="price-text">
+                        ${isFlatDiscount ? `
+                            <span class="price-original-slashed">₹${item.price}</span>
+                            <span class="price-discounted">₹${finalPrice}</span>
+                        ` : `
+                            ₹${item.price}
+                        `}
+                        <span class="unit-label">/ ${item.unit}</span>
+                    </p>
+                    <p class="prod-desc-preview">
+                        ${item.description || 'Premium select wholesale item.'}
+                    </p>
+                </div>
+            `;
+        }).join('');
+
+        // Inject inside the main catalog items container
+        const target = '<main class="products-grid" id="catalog-items"></main>';
+        const replacement = `<main class="products-grid" id="catalog-items">${cardsHtml}</main>`;
+        html = html.replace(target, replacement);
+
+        res.send(html);
+    } catch (err) {
+        console.error('Error pre-rendering products page:', err);
+        // Fallback to sending the plain static file if database/fs fails
+        res.sendFile(path.join(__dirname, 'public', 'products.html'));
+    }
 });
 
 app.get('/shop', (req, res) => {
