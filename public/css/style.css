@@ -727,9 +727,9 @@ section {
 
 /* --- BOTTOM LAYOUT (MAP & FOOTER) --- */
 .bottom-layout {
-    background: var(--card-bg); 
+    background: linear-gradient(to bottom, var(--body-bg) 0%, var(--card-bg) 180px, var(--card-bg) 100%); 
     padding-bottom: 20px;
-    border-top: 1px solid var(--border-color);
+    border-top: none;
     transition: background-color 0.4s ease, border-color 0.4s ease;
     overflow: hidden;
 }
@@ -1659,7 +1659,7 @@ footer {
 
 /* --- FAQ ACCORDION SECTION --- */
 .faq-section {
-    padding: 80px 10% 40px 10%;
+    padding: 100px 10% 60px 10%;
     background: transparent;
     display: flex;
     flex-direction: column;
@@ -1684,14 +1684,16 @@ footer {
     margin-top: 30px;
     display: flex;
     flex-direction: column;
-    gap: 15px;
+    gap: 18px;
 }
 .faq-item {
     background: rgba(255, 255, 255, 0.03);
     border: 1px solid var(--border-color);
     border-radius: 18px;
     overflow: hidden;
-    transition: all 0.3s cubic-bezier(0.165, 0.84, 0.44, 1);
+    transition: transform 0.4s cubic-bezier(0.165, 0.84, 0.44, 1), 
+                border-color 0.4s cubic-bezier(0.165, 0.84, 0.44, 1), 
+                box-shadow 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
     backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);
 }
@@ -1700,8 +1702,9 @@ footer {
     box-shadow: var(--card-shadow);
 }
 .faq-item:hover {
+    transform: translateY(-4px) scale(1.005);
     border-color: var(--gold);
-    box-shadow: 0 10px 25px rgba(212, 175, 55, 0.04);
+    box-shadow: 0 15px 35px rgba(212, 175, 55, 0.08);
 }
 .faq-question {
     padding: 24px 32px;
@@ -1723,7 +1726,7 @@ footer {
 .faq-question i {
     font-size: 1rem;
     color: var(--gold);
-    transition: transform 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+    transition: transform 0.5s cubic-bezier(0.68, -0.6, 0.32, 1.6);
 }
 .faq-answer {
     max-height: 0;
