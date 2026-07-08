@@ -16,6 +16,7 @@
     "jsonwebtoken": "^9.0.3",
     "mysql2": "^3.6.5",
     "nodemailer": "^9.0.1",
+    "pdfkit": "^0.19.1",
     "pg": "^8.11.3"
   },
   "author": "Wellshine Distributors",
