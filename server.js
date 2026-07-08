@@ -10,6 +10,8 @@ const path = require('path');
 const fs = require('fs');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
+const helmet = require('helmet');
+const rateLimit = require('express-rate-limit');
 
 // Load environment variables
 dotenv.config();
@@ -17,8 +19,28 @@ dotenv.config();
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+// Enable Helmet security headers (with CSP disabled to allow CDN assets like Google Fonts/AOS animations/FontAwesome to load cleanly)
+app.use(helmet({
+    contentSecurityPolicy: false
+}));
+
 app.use(cors());
 app.use(express.json());
+
+// Rate Limiter for sensitive authentication and order routes to protect against brute-force attacks and spam
+const authLimiter = rateLimit({
+    windowMs: 15 * 60 * 1000, // 15 minutes
+    max: 25, // limit each IP to 25 requests per windowMs
+    message: { error: 'Too many authentication or checkout requests from this IP. Please try again after 15 minutes.' },
+    standardHeaders: true,
+    legacyHeaders: false,
+});
+
+// Apply rate limiter to auth/orders endpoints
+app.use('/api/auth/login', authLimiter);
+app.use('/api/auth/register', authLimiter);
+app.use('/api/auth/send-otp', authLimiter);
+app.use('/api/orders', authLimiter);
 
 // Force HTTPS redirect on production environments (e.g. Render, AWS, Heroku, Nginx, Cloudflare)
 app.use((req, res, next) => {
