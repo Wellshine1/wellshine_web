@@ -344,6 +344,20 @@ async function setupTables() {
         // Safe to ignore if column already exists
     }
 
+    // Enable Row-Level Security (RLS) on PostgreSQL for Supabase compliance
+    if (dbType === 'postgres' || dbType === 'postgresql') {
+        try {
+            console.log('Enabling Row-Level Security (RLS) on tables for Supabase compliance...');
+            const tables = ['products', 'users', 'orders', 'otp_verifications'];
+            for (const table of tables) {
+                await query(`ALTER TABLE ${table} ENABLE ROW LEVEL SECURITY`);
+            }
+            console.log('Row-Level Security (RLS) successfully verified/enabled on all tables.');
+        } catch (err) {
+            console.error('Error enabling Row-Level Security:', err.message);
+        }
+    }
+
     // Sync product details and catalog on startup
     console.log('Syncing product details and catalog...');
     await seedProducts();
