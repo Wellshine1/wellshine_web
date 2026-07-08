@@ -727,7 +727,7 @@ section {
 
 /* --- BOTTOM LAYOUT (MAP & FOOTER) --- */
 .bottom-layout {
-    background: linear-gradient(to bottom, var(--body-bg) 0%, var(--card-bg) 180px, var(--card-bg) 100%); 
+    background: transparent; 
     padding-bottom: 20px;
     border-top: none;
     transition: background-color 0.4s ease, border-color 0.4s ease;
